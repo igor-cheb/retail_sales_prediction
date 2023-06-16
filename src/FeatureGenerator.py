@@ -1,27 +1,18 @@
 from itertools import product
 import pandas as pd
 
+from src.utilities import generate_backbone
 from src.settings import PROCESSED_PATH, WINS_SHIFTS, ROLL_FUNCS, COLS_MIN_MAX
 
 class FeatureGenerator():
     """Class to generate all features used for training or inference"""
 
-    # TODO: shop_id_min etc. should be replaced with COLS_MIN_MAX from settings
-    # TODO: _gen_shop_month_backbone tb moved to utilities and reused in TestGenerator as well
+    # TODO: verify that new columns are created with correct indices
 
     def __init__(self):
         self.merged_df = pd.read_parquet(PROCESSED_PATH + 'merged_train_df.parquet')
-        self.shop_id_min, self.shop_id_max = COLS_MIN_MAX['shop_id'][0], COLS_MIN_MAX['shop_id'][1]
-        self.month_min, self.month_max = COLS_MIN_MAX['date_block_num'][0], COLS_MIN_MAX['date_block_num'][1]
-        
         self.shop_group_cols = ['shop_id', 'date_block_num']
-
-    def _gen_shop_month_backbone(self):
-        """Creating dataframe where for each combination of shop and item every month is present"""
-        self.shop_month_index_backbone = pd.DataFrame(product(
-            range(self.shop_id_min, self.shop_id_max+1),
-            range(self.month_min, self.month_max+1)
-        ), columns = ['shop_id', 'date_block_num'])
+        self.shop_month_index_backbone = generate_backbone(cols_for_backbone=self.shop_group_cols)
     
     def _gen_base_features(self):
         """Adding shop_id level feature aggregates"""
@@ -38,7 +29,6 @@ class FeatureGenerator():
         local_df = self.shop_month_index_backbone.merge(local_df, 
                                                         how='left', 
                                                         on=self.shop_group_cols).fillna(0)
-
         return local_df
 
     def _add_shifts(self, 
@@ -66,7 +56,6 @@ class FeatureGenerator():
     
     def generate_features(self):
         """Calculating all features and merging them in one dataset"""
-        self._gen_shop_month_backbone()
         feats_df = self._gen_base_features()
         simple_agg_cols = [f'item_price_{agg}' for agg in ROLL_FUNCS] + ['deals_count']
         feats_df = self._add_shifts(df=feats_df, shift_cols=simple_agg_cols)

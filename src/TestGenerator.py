@@ -2,7 +2,7 @@ import pandas as pd
 from itertools import product
 
 from src.FeatureGenerator import *
-from src.settings import COLS_MIN_MAX #SHOP_ID_MIN_MAX, ITEM_ID_MIN_MAX
+from src.utilities import generate_backbone
 
 class TestGenerator():
     """
@@ -17,14 +17,6 @@ class TestGenerator():
         # TODO: merged_df is read in FeatureGenerator too, should be optimised
         if train:
             self.merged_df = pd.read_parquet(PROCESSED_PATH + 'merged_train_df.parquet')
-
-    def _generate_backbone(self, 
-                          cols_for_backbone: list[str]=['shop_id', 'item_id', 'date_block_num']
-                          ) -> pd.DataFrame:
-        # creating dataframe where for each combination of shop and item every month is present
-        ranges = [range(COLS_MIN_MAX[col][0], COLS_MIN_MAX[col][1]+1) for col in cols_for_backbone]
-        index_backbone = pd.DataFrame(product(*ranges), columns = cols_for_backbone)
-        return index_backbone
 
     # 2 functions below are used for training only
     
@@ -42,7 +34,7 @@ class TestGenerator():
                         .rename(columns={'item_cnt_day':'sum_sales_cnt'})
 
         # generating backbone with all combinations of the index columns
-        index_backbone = self._generate_backbone()
+        index_backbone = generate_backbone()
 
         # merging aggregated initial df with the backbone to calculate target correctly
         extended_target_df = index_backbone.merge(target_df, how='left', on=grouping_cols).fillna(0)
@@ -72,17 +64,7 @@ class TestGenerator():
         
         return all_target
 
-    # 3 functions below are used for inference only
-
-    def generate_shop_item_backbone(self, test_size: int) -> pd.DataFrame:
-        """
-        Function generates backbone dataframe with 
-        shop_id, item_id approximately of the passed size.
-        TB used for cross validation.
-        """
-        # TODO control for percentage of item_ids and shop_ids not seen in training, keep under 10%
-        backbone = self._generate_backbone(cols_for_backbone=['shop_id', 'item_id'])
-        return backbone.sample(test_size).reset_index(drop=True)
+    # 2 functions below are used for inference only
 
     def add_month_to_backbone(self, 
                               shop_item_backbone: pd.DataFrame, 
@@ -105,3 +87,20 @@ class TestGenerator():
         """
         feats = feat_generator.generate_features()
         return test_backbone.merge(feats, how='left')
+    
+
+
+
+
+
+
+
+
+    # def generate_shop_item_backbone(self, test_size: int) -> pd.DataFrame:
+    #     """
+    #     Function generates backbone dataframe with 
+    #     shop_id, item_id of the passed size.
+    #     """
+    #     # TODO control for percentage of item_ids and shop_ids not seen in training, keep under 10%
+    #     backbone = generate_backbone(cols_for_backbone=['shop_id', 'item_id'])
+    #     return backbone.sample(test_size).reset_index(drop=True)
