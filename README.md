@@ -1,5 +1,5 @@
 # honest_home_task
-WORK IN PROGRESS
+WORK IN PROGRESS </br>
 Implementation of a take home task as part of Honest bank recruitment process
 
 Project structure:
