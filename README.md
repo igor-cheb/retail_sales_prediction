@@ -1,4 +1,5 @@
 # honest_home_task
+WORK IN PROGRESS
 Implementation of a take home task as part of Honest bank recruitment process
 
 Project structure:
@@ -12,3 +13,5 @@ Project structure:
     <li>pathfinder_modelling: sandbox for modelling experiments</li>
     </ul>
 </ul>
+
+WORK IN PROGRESS
