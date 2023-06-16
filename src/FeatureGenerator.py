@@ -5,6 +5,11 @@ from src.settings import PROCESSED_PATH, WINS_SHIFTS, ROLL_FUNCS
 
 class FeatureGenerator():
     """Class to generate all features used for training or inference"""
+
+    # TODO: shop_id_min etc. should be replaced with COLS_MIN_MAX from settings
+    # TODO: it should be possible to merge _gen_deals_per_month_feats and _gen_revenue_per_shop_month_feats
+    # TODO: _gen_shop_month_backbone tb moved to utilities and reused in TestGenerator as well
+    
     def __init__(self):
         self.merged_df = pd.read_parquet(PROCESSED_PATH + 'merged_train_df.parquet')
         self.shop_id_min, self.shop_id_max = self.merged_df['shop_id'].min(), self.merged_df['shop_id'].max()

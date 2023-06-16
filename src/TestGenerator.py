@@ -9,7 +9,12 @@ class TestGenerator():
     Class to generate test datasets for crossvalidation or 
     generate features for a provided ready shop_id-item_id index backbone.
     """
+    # TODO: consider building a separate TargetGenerator class with 
+    # generate_all_targets and generate_target_for_month
+    # then pass it along with FeatureGenerator and merge it here
+
     def __init__(self, train: bool=False):
+        # TODO: merged_df is read in FeatureGenerator too, should be optimised
         if train:
             self.merged_df = pd.read_parquet(PROCESSED_PATH + 'merged_train_df.parquet')
 
