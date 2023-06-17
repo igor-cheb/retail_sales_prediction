@@ -18,14 +18,14 @@ def run_cv(df: pd.DataFrame,
            months_cv_split: TimeSeriesSplit, 
            model: Any,
            cols_di: dict,
-           verbose: bool=False) -> dict:
+           verbose: int=0) -> dict:
     """
     Function that performs cross validation using passed model 
     over the passed df with all features and month column and passed
     splitter by months
     """
-    all_months = df['date_block_num'].unique()
-    all_months = all_months[all_months > max(WINS_SHIFTS)] # leaving enough months for longest shift/window calculation
+    all_months = np.array(sorted(df['date_block_num'].unique()))
+    all_months = all_months[all_months > max(WINS_SHIFTS)]# leaving enough months for longest shift/window calculation
 
     cv_results = {'rmse':[], 'nrmse':[], 'train_months':[], 'test_months':[]}
 
@@ -42,18 +42,18 @@ def run_cv(df: pd.DataFrame,
         rmse = mean_squared_error(y_true=y_true, y_pred=y_pred)**(.5)
         nrmse = rmse / np.std(y_true) # (np.percentile(y_true, 75) - np.percentile(y_true, 25))
 
-        if verbose:
+        if verbose == 2:
             print(f"Fold {i}:")
             print(f"  Train months: {all_months[train_index]}")
             print(f"  Test months: {all_months[test_index]}")
             print(f'  NRMSE: {nrmse: .2}')
             print(f'  RMSE : {rmse: .2}\n')
+            print('\n' + '-'*30)
 
         cv_results['rmse'].append(rmse); cv_results['nrmse'].append(nrmse)
         cv_results['train_months'].append(all_months[train_index])
         cv_results['test_months'].append(all_months[test_index])
-    if verbose:
-        print('\n' + '-'*30)
+    if verbose in [1, 2]:
         print(f"RMSE mean: {np.mean(cv_results['rmse']):.2}")
         print(f"NRMSE mean: {np.mean(cv_results['nrmse']):.2}")
     return cv_results
