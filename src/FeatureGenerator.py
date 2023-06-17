@@ -29,6 +29,7 @@ class FeatureGenerator():
         local_df = self.shop_month_index_backbone.merge(local_df, 
                                                         how='left', 
                                                         on=self.shop_group_cols).fillna(0)
+        self.base_feat_cols = [f'item_price_{agg}' for agg in ROLL_FUNCS] + ['deals_count']
         return local_df
 
     def _add_shifts(self, 
@@ -36,9 +37,12 @@ class FeatureGenerator():
                     shift_cols: list[str]) -> pd.DataFrame:
         """Adding lag features to the passed df based on passed shift_cols columns"""
         local_df = df.sort_values(self.shop_group_cols).set_index('shop_id').copy()
+        self.lag_cols = []
         for shift in WINS_SHIFTS:
             for col in shift_cols:
-                local_df[f'{col}_shift_{shift}'] = local_df.groupby('shop_id')[col].shift(periods=shift, fill_value=0)
+                new_col = f'{col}_shift_{shift}'
+                self.lag_cols.append(new_col)
+                local_df[new_col] = local_df.groupby('shop_id')[col].shift(periods=shift, fill_value=0)
         return local_df.reset_index()
 
     def _add_rolling_windows(self,
@@ -47,18 +51,20 @@ class FeatureGenerator():
         """Adding window aggregates to the passed df based on passed cols_to_agg columns"""
         local_df = df.sort_values(self.shop_group_cols)
 
+        self.roll_cols = []
         for func in ROLL_FUNCS:
             for win_len in WINS_SHIFTS:
                 for col in cols_to_agg:
-                    local_df[f'{col}_roll_{func}_{win_len}'] = local_df.groupby('shop_id').rolling(win_len, min_periods=1)\
+                    new_name = f'{col}_roll_{func}_{win_len}'
+                    self.roll_cols.append(new_name)
+                    local_df[new_name] = local_df.groupby('shop_id').rolling(win_len, min_periods=1)\
                             .agg({col: func}).reset_index(drop=True).fillna(0)
         return local_df
     
     def generate_features(self):
         """Calculating all features and merging them in one dataset"""
         feats_df = self._gen_base_features()
-        simple_agg_cols = [f'item_price_{agg}' for agg in ROLL_FUNCS] + ['deals_count']
-        feats_df = self._add_shifts(df=feats_df, shift_cols=simple_agg_cols)
-        roll_cols = ['item_price_sum', 'item_price_mean', 'deals_count']
-        feats_df = self._add_rolling_windows(df=feats_df, cols_to_agg=roll_cols)
+        feats_df = self._add_shifts(df=feats_df, shift_cols=self.base_feat_cols)
+        cols_to_roll = ['item_price_sum', 'item_price_mean', 'deals_count']
+        feats_df = self._add_rolling_windows(df=feats_df, cols_to_agg=cols_to_roll)
         return feats_df
