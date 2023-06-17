@@ -8,8 +8,8 @@ from sklearn.model_selection import TimeSeriesSplit
 from src.settings import COLS_MIN_MAX, WINS_SHIFTS
 
 def generate_backbone(cols_for_backbone: list[str]=['shop_id', 'item_id', 'date_block_num']
-                        ) -> pd.DataFrame:
-    # creating dataframe where for each combination of shop and item every month is present
+                     ) -> pd.DataFrame:
+    """Creating dataframe with all combinations of values of passed col are present"""
     ranges = [range(COLS_MIN_MAX[col][0], COLS_MIN_MAX[col][1]+1) for col in cols_for_backbone]
     index_backbone = pd.DataFrame(product(*ranges), columns = cols_for_backbone)
     return index_backbone
@@ -18,7 +18,7 @@ def run_cv(df: pd.DataFrame,
            months_cv_split: TimeSeriesSplit, 
            model: Any,
            cols_di: dict,
-           verbose: bool=False):
+           verbose: bool=False) -> dict:
     """
     Function that performs cross validation using passed model 
     over the passed df with all features and month column and passed
