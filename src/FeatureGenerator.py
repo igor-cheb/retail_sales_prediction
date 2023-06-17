@@ -7,8 +7,6 @@ from src.settings import PROCESSED_PATH, WINS_SHIFTS, ROLL_FUNCS, COLS_MIN_MAX
 class FeatureGenerator():
     """Class to generate all features used for training or inference"""
 
-    # TODO: verify that new columns are created with correct indices
-
     def __init__(self):
         self.merged_df = pd.read_parquet(PROCESSED_PATH + 'merged_train_df.parquet')
         self.shop_group_cols = ['shop_id', 'date_block_num']
@@ -40,25 +38,30 @@ class FeatureGenerator():
         self.lag_cols = []
         for shift in WINS_SHIFTS:
             for col in shift_cols:
-                new_col = f'{col}_shift_{shift}'
-                self.lag_cols.append(new_col)
-                local_df[new_col] = local_df.groupby('shop_id')[col].shift(periods=shift, fill_value=0)
+                if col in local_df:
+                    new_col = f'{col}_shift_{shift}'
+                    self.lag_cols.append(new_col)
+                    # this assignment works b/c it's same as joining by index and shop_id is index
+                    local_df[new_col] = local_df.groupby('shop_id')[col].shift(periods=shift, fill_value=0)
         return local_df.reset_index()
 
     def _add_rolling_windows(self,
                              df: pd.DataFrame,
-                             cols_to_agg: list[str]) -> pd.DataFrame:
+                             cols_to_roll: list[str]) -> pd.DataFrame:
         """Adding window aggregates to the passed df based on passed cols_to_agg columns"""
         local_df = df.sort_values(self.shop_group_cols)
 
         self.roll_cols = []
         for func in ROLL_FUNCS:
             for win_len in WINS_SHIFTS:
-                for col in cols_to_agg:
-                    new_name = f'{col}_roll_{func}_{win_len}'
-                    self.roll_cols.append(new_name)
-                    local_df[new_name] = local_df.groupby('shop_id').rolling(win_len, min_periods=1)\
-                            .agg({col: func}).reset_index(drop=True).fillna(0)
+                for col in cols_to_roll:
+                    if col in local_df:
+                        new_name = f'{col}_roll_{func}_{win_len}'
+                        self.roll_cols.append(new_name)
+                        # this assignment works b/c it's same as joining by index and
+                        # the dataset is ordered by shop and month
+                        local_df[new_name] = local_df.groupby('shop_id').rolling(win_len, min_periods=1)\
+                                .agg({col: func}).reset_index(drop=True).fillna(0)
         return local_df
     
     def generate_features(self) -> pd.DataFrame:
@@ -66,5 +69,5 @@ class FeatureGenerator():
         feats_df = self._gen_base_features()
         feats_df = self._add_shifts(df=feats_df, shift_cols=self.base_feat_cols)
         cols_to_roll = ['item_price_sum', 'item_price_mean', 'deals_count']
-        feats_df = self._add_rolling_windows(df=feats_df, cols_to_agg=cols_to_roll)
+        feats_df = self._add_rolling_windows(df=feats_df, cols_to_roll=cols_to_roll)
         return feats_df
