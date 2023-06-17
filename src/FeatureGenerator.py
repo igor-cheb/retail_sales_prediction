@@ -14,7 +14,7 @@ class FeatureGenerator():
         self.shop_group_cols = ['shop_id', 'date_block_num']
         self.shop_month_index_backbone = generate_backbone(cols_for_backbone=self.shop_group_cols)
     
-    def _gen_base_features(self):
+    def _gen_base_features(self) -> pd.DataFrame:
         """Adding shop_id level feature aggregates"""
         local_df = self.merged_df[['date_block_num', 'shop_id', 'item_id', 'item_price']]\
                         .reset_index(drop=True).copy()
@@ -61,7 +61,7 @@ class FeatureGenerator():
                             .agg({col: func}).reset_index(drop=True).fillna(0)
         return local_df
     
-    def generate_features(self):
+    def generate_features(self) -> pd.DataFrame:
         """Calculating all features and merging them in one dataset"""
         feats_df = self._gen_base_features()
         feats_df = self._add_shifts(df=feats_df, shift_cols=self.base_feat_cols)

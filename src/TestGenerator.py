@@ -20,7 +20,7 @@ class TestGenerator():
 
     # 2 functions below are used for training only
     
-    def generate_all_targets(self):
+    def generate_all_targets(self) -> pd.DataFrame:
         """
         Function creates 1 month lookahead target for all possible combinations of 
         shops, items and months. Used for training only.
@@ -44,7 +44,7 @@ class TestGenerator():
         extended_target_df['target'] = extended_target_df.groupby(grouping_cols[:-1])['sum_sales_cnt'].shift(-1)
         return extended_target_df
 
-    def generate_target_for_month(self, month_nums: list[int]):
+    def generate_target_for_month(self, month_nums: list[int]) -> pd.DataFrame:
         """Function to generate target column for particular month. Used for training only."""
         # generating all possible targets
         all_target = self.generate_all_targets()
