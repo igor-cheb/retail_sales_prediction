@@ -9,7 +9,7 @@ from src.settings import COLS_MIN_MAX, WINS_SHIFTS
 
 def generate_backbone(cols_for_backbone: list[str]=['shop_id', 'item_id', 'date_block_num']
                      ) -> pd.DataFrame:
-    """Creating dataframe with all combinations of values of passed col are present"""
+    """Creating dataframe with all combinations of passed columns values are present"""
     ranges = [range(COLS_MIN_MAX[col][0], COLS_MIN_MAX[col][1]+1) for col in cols_for_backbone]
     index_backbone = pd.DataFrame(product(*ranges), columns = cols_for_backbone)
     return index_backbone
