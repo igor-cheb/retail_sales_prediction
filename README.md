@@ -10,7 +10,7 @@ Project structure:
     <ul>
     <li>EDA: short data exploration</li>
     <li>ETL: sandbox notebook for development and testing of feature engineering and cross validation </li>
-    <li>pathfinder_modelling: sandbox for modelling experiments</li>
+    <li>modelling: sandbox for modelling experiments</li>
     </ul>
 </ul>
 
