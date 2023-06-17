@@ -17,7 +17,8 @@ def generate_backbone(cols_for_backbone: list[str]=['shop_id', 'item_id', 'date_
 def run_cv(df: pd.DataFrame, 
            months_cv_split: TimeSeriesSplit, 
            model: Any,
-           cols_di: dict):
+           cols_di: dict,
+           verbose: bool=False):
     """
     Function that performs cross validation using passed model 
     over the passed df with all features and month column and passed
@@ -26,14 +27,12 @@ def run_cv(df: pd.DataFrame,
     all_months = df['date_block_num'].unique()
     all_months = all_months[all_months > max(WINS_SHIFTS)] # leaving enough months for longest shift/window calculation
 
+    cv_results = {'rmse':[], 'nrmse':[], 'train_months':[], 'test_months':[]}
+
     for i, (train_index, test_index) in enumerate(months_cv_split.split(all_months)):
         train_months = all_months[train_index]
         test_months = all_months[test_index]
         
-        print(f"Fold {i}:")
-        print(f"  Train: target months={all_months[train_index]}")
-        print(f"  Test:  target months={all_months[test_index]}")
-
         train_df = df[df['date_block_num'].isin(train_months)]
         test_df = df[df['date_block_num'].isin(test_months)]
 
@@ -42,5 +41,19 @@ def run_cv(df: pd.DataFrame,
         y_pred = model.predict(X=test_df[cols_di['feats']])
         rmse = mean_squared_error(y_true=y_true, y_pred=y_pred)**(.5)
         nrmse = rmse / np.std(y_true) # (np.percentile(y_true, 75) - np.percentile(y_true, 25))
-        print(f'  NRMSE: {nrmse: .2}')
-        print(f'  RMSE : {rmse: .2}\n')
+
+        if verbose:
+            print(f"Fold {i}:")
+            print(f"  Train months: {all_months[train_index]}")
+            print(f"  Test months: {all_months[test_index]}")
+            print(f'  NRMSE: {nrmse: .2}')
+            print(f'  RMSE : {rmse: .2}\n')
+
+        cv_results['rmse'].append(rmse); cv_results['nrmse'].append(nrmse)
+        cv_results['train_months'].append(all_months[train_index])
+        cv_results['test_months'].append(all_months[test_index])
+    if verbose:
+        print('\n' + '-'*30)
+        print(f"RMSE mean: {np.mean(cv_results['rmse']):.2}")
+        print(f"NRMSE mean: {np.mean(cv_results['nrmse']):.2}")
+    return cv_results
