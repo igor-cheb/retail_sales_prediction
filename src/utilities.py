@@ -24,7 +24,7 @@ def run_cv(df: pd.DataFrame,
     over the passed df with all features and month column and passed
     splitter by months
     """
-    all_months = np.array(sorted(df['date_block_num'].unique()))
+    all_months = np.array(sorted(df['date_block_num'].unique())) + 1
     all_months = all_months[all_months > max(WINS_SHIFTS)]# leaving enough months for longest shift/window calculation
 
     cv_results = {'rmse':[], 'nrmse':[], 'train_months':[], 'test_months':[]}
