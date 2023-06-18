@@ -5,7 +5,7 @@ from itertools import product
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import TimeSeriesSplit
 
-from src.settings import COLS_MIN_MAX, WINS_SHIFTS
+from src.settings import COLS_MIN_MAX, SHIFTS, WINS
 
 def generate_backbone(cols_for_backbone: list[str]=['shop_id', 'item_id', 'date_block_num']
                      ) -> pd.DataFrame:
@@ -24,9 +24,8 @@ def run_cv(df: pd.DataFrame,
     over the passed df with all features and month column and passed
     splitter by months
     """
-    all_months = np.array(sorted(df['date_block_num'].unique())) + 1
-    all_months = all_months[all_months > max(WINS_SHIFTS)]# leaving enough months for longest shift/window calculation
-
+    all_months = np.array(sorted(df['date_block_num'].unique()))
+    all_months = all_months[all_months >= max([max(SHIFTS), max(WINS)])]# leaving enough months for longest shift/window calculation
     cv_results = {'rmse':[], 'nrmse':[], 'train_months':[], 'test_months':[]}
 
     for i, (train_index, test_index) in enumerate(months_cv_split.split(all_months)):
@@ -35,10 +34,12 @@ def run_cv(df: pd.DataFrame,
         
         train_df = df[df['date_block_num'].isin(train_months)]
         test_df = df[df['date_block_num'].isin(test_months)]
+        print(len(test_df), len(train_df))
 
         model.fit(X=train_df[cols_di['feats']], y=train_df[cols_di['target']])
         y_true = test_df[cols_di['target']].values
         y_pred = model.predict(X=test_df[cols_di['feats']])
+        
         rmse = mean_squared_error(y_true=y_true, y_pred=y_pred)**(.5)
         nrmse = rmse / np.std(y_true) # (np.percentile(y_true, 75) - np.percentile(y_true, 25))
 

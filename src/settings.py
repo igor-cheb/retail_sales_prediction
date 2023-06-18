@@ -5,14 +5,22 @@ RAW_PATH = 'data/raw/'
 PROCESSED_PATH = 'data/processed/'
 
 #length of windows and shifts
-WINS_SHIFTS = [2, 6, 12]
+SHIFTS = [1, 2, 6, 12]
+WINS = [3, 9]
 
 #functions to be calculated as window aggregates
-ROLL_FUNCS = ['sum', 'mean', 'std', 'min', 'max']
+ROLL_FUNCS = ['sum'] #, 'mean', 'std', 'min', 'max'
 
 # min and max for months and IDs of shops and items. Extracted from respective raw files
 COLS_MIN_MAX = {
-    'shop_id': (0, 59), 
+    'shop_id': (26, 28),#(0, 59), 
     'item_id': (0, 22169),
     'date_block_num': (0, 33)
+}
+
+# columns groups for aggregate calculation
+GROUP_COLS = {
+    'shop': ['shop_id', 'date_block_num'],
+    'item': ['item_id', 'date_block_num'],
+    'shop_item': ['shop_id', 'item_id', 'date_block_num']
 }
