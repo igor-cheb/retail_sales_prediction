@@ -67,12 +67,12 @@ class FeatureGenerator():
         group = GROUP_COLS['shop_item']
         sorted_df = df[group + [col]].drop_duplicates().sort_values(group).copy()
         for win_len in WINS:
-            # groupping_k = col.split('_per_')[1] if not col == target_col[0] else 'shop_item'
             roll_df = sorted_df.copy()
             new_name = f'{col}_roll_mean_{win_len}'
+            # closed param makes sure current row is not included in the window
             roll_df = roll_df.groupby(group[:-1], as_index=False)\
                              .rolling(win_len, on='date_block_num', 
-                                      closed='right')[col].mean().fillna(0).reset_index()\
+                                      closed='left')[col].mean().fillna(0).reset_index()\
                              .rename(columns={col: new_name})
             local_df = local_df.merge(roll_df, how='left', on=group)
             self.roll_cols.append(new_name)

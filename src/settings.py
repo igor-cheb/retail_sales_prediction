@@ -6,8 +6,9 @@ PROCESSED_PATH = 'data/processed/'
 
 #length of windows and shifts
 # SHIFTS = [1, 2, 6, 12]
-SHIFTS = [2, 4, 8, 12]
-WINS = [3, 9]
+SHIFTS = [1, 2, 3, 8, 12]
+# SHIFTS = [2, 4, 8, 12]
+WINS = [2, 5, 12]
 
 #functions to be calculated as window aggregates
 ROLL_FUNCS = ['sum', 'mean'] #, 'mean', 'std', 'min', 'max'
