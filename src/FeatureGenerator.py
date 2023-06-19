@@ -10,9 +10,9 @@ class FeatureGenerator():
     def __init__(self, target_months: Optional[list]=None):
         self.merged_df = pd.read_parquet(PROCESSED_PATH + 'merged_train_df.parquet')
 
-        self.index_cols = ['shop_id', 'item_id', 'date_block_num']
-        self.base_cols = ['item_price', 'item_cnt_day']
-        self.target_col = ['target']
+        self.index_cols: list[str] = ['shop_id', 'item_id', 'date_block_num']
+        self.base_cols: list[str] = ['item_price', 'item_cnt_day']
+        self.target_col: list[str] = ['target']
 
         self.target_months = target_months
         # if test data is generated for particular months, we want to make sure
@@ -37,8 +37,8 @@ class FeatureGenerator():
             res_df = res_df.merge(agg_df, how='left', on=group).fillna(0)
 
         res_df = res_df.rename(columns={'item_cnt_day_sum_per_shop_item': 'target'})
-        self.base_feat_cols = [col for col in res_df if col not in 
-                               self.index_cols + self.base_cols + self.target_col]
+        self.base_feat_cols = [str(col) for col in res_df if col not in 
+                                          self.index_cols + self.base_cols + self.target_col]
         return res_df
 
     def _add_shifts(self, 
@@ -80,7 +80,7 @@ class FeatureGenerator():
         """Calculating all features and merging them in one dataset"""
         feats_df = self._gen_base_features()
         feats_df = self._add_shifts(df=feats_df, 
-                                    cols_to_shift=(self.base_feat_cols + self.target_col))
+                                    cols_to_shift=self.base_feat_cols + self.target_col)
         feats_df = self._add_rolling_windows(df=feats_df)
 
         out_cols = self.index_cols + self.target_col + self.shifted_cols + self.roll_cols
@@ -95,6 +95,7 @@ class FeatureGenerator():
         Function takes in test backbone, i.e. df of shops and items, 
         calls feature generator and returns the merged result.
         """
-        test_backbone['date_block_num'] = self.target_months[0] 
+        if self.target_months:
+            test_backbone['date_block_num'] = self.target_months[0] 
         feats = self.generate_features()
         return test_backbone.merge(feats, how='left').fillna(0)
