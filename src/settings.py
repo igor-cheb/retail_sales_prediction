@@ -5,11 +5,12 @@ RAW_PATH = 'data/raw/'
 PROCESSED_PATH = 'data/processed/'
 
 #length of windows and shifts
-SHIFTS = [1, 2, 6, 12]
+# SHIFTS = [1, 2, 6, 12]
+SHIFTS = [2, 4, 8, 12]
 WINS = [3, 9]
 
 #functions to be calculated as window aggregates
-ROLL_FUNCS = ['sum'] #, 'mean', 'std', 'min', 'max'
+ROLL_FUNCS = ['sum', 'mean'] #, 'mean', 'std', 'min', 'max'
 
 # min and max for months and IDs of shops and items. Extracted from respective raw files
 COLS_MIN_MAX = {
