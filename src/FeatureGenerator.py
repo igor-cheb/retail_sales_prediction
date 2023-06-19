@@ -1,5 +1,6 @@
 from itertools import product
 import pandas as pd
+from typing import  Optional
 
 from src.utilities import generate_backbone
 from src.settings import PROCESSED_PATH, SHIFTS, WINS, ROLL_FUNCS, COLS_MIN_MAX, GROUP_COLS
@@ -7,14 +8,22 @@ from src.settings import PROCESSED_PATH, SHIFTS, WINS, ROLL_FUNCS, COLS_MIN_MAX,
 class FeatureGenerator():
     """Class to generate all features used for training or inference"""
 
-    def __init__(self):
+    def __init__(self, target_months: Optional[list]=None):
         self.merged_df = pd.read_parquet(PROCESSED_PATH + 'merged_train_df.parquet')
         # self.merged_df = self.merged_df[self.merged_df['shop_id'].isin([26, 27, 28])]
 
         self.index_cols = ['shop_id', 'item_id', 'date_block_num']
         self.base_cols = ['item_price', 'item_cnt_day']
         self.target_col = ['target']
-        self.backbone = generate_backbone()
+
+        self.target_months = target_months
+        # if test data is generated for particular months, we want to make sure
+        # that those months are in the min max range of COLS_MIN_MAX
+        if target_months:
+            new_max_month = max(target_months)
+            new_min_month = min([new_max_month, COLS_MIN_MAX['date_block_num'][0]])
+            COLS_MIN_MAX['date_block_num'] = (new_min_month, new_max_month)
+        self.backbone = generate_backbone(cols_min_max=COLS_MIN_MAX)
     
     def _gen_base_features(self) -> pd.DataFrame:
         """Adding shop_id level feature aggregates"""
@@ -115,4 +124,9 @@ class FeatureGenerator():
         feats_df = self._add_shifts(df=feats_df, 
                                     cols_to_shift=(self.base_feat_cols + self.target_col))
         feats_df = self._add_rolling_windows(df=feats_df)
-        return feats_df
+
+        out_cols = self.index_cols + self.shifted_cols + self.roll_cols
+        if self.target_months:
+            return feats_df[feats_df['date_block_num'].isin(self.target_months)][out_cols]
+        else: 
+            return feats_df[out_cols]

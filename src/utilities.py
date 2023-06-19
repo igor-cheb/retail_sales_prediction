@@ -6,13 +6,26 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import TimeSeriesSplit
 
 from src.settings import COLS_MIN_MAX, SHIFTS, WINS
+from src.FeatureGenerator import FeatureGenerator
 
-def generate_backbone(cols_for_backbone: list[str]=['shop_id', 'item_id', 'date_block_num']
+def generate_backbone(cols_for_backbone: list[str]=['shop_id', 'item_id', 'date_block_num'],
+                      cols_min_max: dict=COLS_MIN_MAX
                      ) -> pd.DataFrame:
     """Creating dataframe with all combinations of passed columns values are present"""
-    ranges = [range(COLS_MIN_MAX[col][0], COLS_MIN_MAX[col][1]+1) for col in cols_for_backbone]
+    ranges = [range(cols_min_max[col][0], cols_min_max[col][1]+1) for col in cols_for_backbone]
     index_backbone = pd.DataFrame(product(*ranges), columns = cols_for_backbone)
     return index_backbone
+
+def add_features_to_backbone(month_num: int,
+                             test_backbone: pd.DataFrame) -> pd.DataFrame:
+    """
+    Function takes in test backbone, i.e. df of shops and items and a given month, 
+    calls feature generator and returns the merged result.
+    """
+    test_backbone['date_block_num'] = month_num 
+    feat_generator = FeatureGenerator(target_months=[month_num])
+    feats = feat_generator.generate_features()
+    return test_backbone.merge(feats, how='left').fillna(0)
 
 def run_cv(df: pd.DataFrame, 
            months_cv_split: TimeSeriesSplit, 
