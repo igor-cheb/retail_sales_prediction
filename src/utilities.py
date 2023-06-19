@@ -27,7 +27,8 @@ def run_cv(df: pd.DataFrame,
     """
     all_months = np.array(sorted(df['date_block_num'].unique()))
     all_months = all_months[all_months >= max([max(SHIFTS), max(WINS)])]# leaving enough months for longest shift/window calculation
-    cv_results = {'rmse':[], 'nrmse':[], 'train_months':[], 'test_months':[]}
+    cv_results = {'rmse':[], 'nrmse':[], 'train_months':[], 
+                  'test_months':[], 'train_data':[], 'test_data':[], 'pred':[]}
 
     for i, (train_index, test_index) in enumerate(months_cv_split.split(all_months)):
         train_months = all_months[train_index]
@@ -35,7 +36,6 @@ def run_cv(df: pd.DataFrame,
         
         train_df = df[df['date_block_num'].isin(train_months)]
         test_df = df[df['date_block_num'].isin(test_months)]
-        print(len(test_df), len(train_df))
 
         model.fit(X=train_df[cols_di['feats']], y=train_df[cols_di['target']])
         y_true = test_df[cols_di['target']].values
@@ -46,16 +46,19 @@ def run_cv(df: pd.DataFrame,
 
         if verbose == 2:
             print(f"Fold {i}:")
-            print(f"  Train months: {all_months[train_index]}")
-            print(f"  Test months: {all_months[test_index]}")
+            print(f"  Train months: {all_months[train_index]}, size: {len(train_df):,}")
+            print(f"  Test months: {all_months[test_index]},   size: {len(test_df):,}")
             print(f'  NRMSE: {nrmse: .2}')
             print(f'  RMSE : {rmse: .2}\n')
-            print('\n' + '-'*30)
 
         cv_results['rmse'].append(rmse); cv_results['nrmse'].append(nrmse)
         cv_results['train_months'].append(all_months[train_index])
         cv_results['test_months'].append(all_months[test_index])
+        cv_results['train_data'].append(train_df)
+        cv_results['test_data'].append(test_df)
+        cv_results['pred'].append(y_pred)
     if verbose in [1, 2]:
+        print('\n' + '-'*30)
         print(f"RMSE mean: {np.mean(cv_results['rmse']):.2}")
         print(f"NRMSE mean: {np.mean(cv_results['nrmse']):.2}")
     return cv_results

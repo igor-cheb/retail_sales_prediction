@@ -7,6 +7,8 @@ from src.settings import PROCESSED_PATH, SHIFTS, WINS, ROLL_FUNCS, COLS_MIN_MAX,
 class FeatureGenerator():
     """Class to generate all features used for training or inference"""
 
+    # TODO: join categories column
+    
     def __init__(self, target_months: Optional[list]=None):
         self.merged_df = pd.read_parquet(PROCESSED_PATH + 'merged_train_df.parquet')
 
