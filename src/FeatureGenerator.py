@@ -1,6 +1,5 @@
-from itertools import product
-import pandas as pd
 from typing import  Optional
+import pandas as pd
 
 from src.utilities import generate_backbone
 from src.settings import PROCESSED_PATH, SHIFTS, WINS, ROLL_FUNCS, COLS_MIN_MAX, GROUP_COLS
