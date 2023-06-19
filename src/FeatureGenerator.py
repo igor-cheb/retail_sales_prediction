@@ -125,8 +125,18 @@ class FeatureGenerator():
                                     cols_to_shift=(self.base_feat_cols + self.target_col))
         feats_df = self._add_rolling_windows(df=feats_df)
 
-        out_cols = self.index_cols + self.shifted_cols + self.roll_cols
+        out_cols = self.index_cols + self.target_col + self.shifted_cols + self.roll_cols
         if self.target_months:
             return feats_df[feats_df['date_block_num'].isin(self.target_months)][out_cols]
         else: 
             return feats_df[out_cols]
+    
+    def add_features_to_backbone(self,
+                                 test_backbone: pd.DataFrame) -> pd.DataFrame:
+        """
+        Function takes in test backbone, i.e. df of shops and items, 
+        calls feature generator and returns the merged result.
+        """
+        test_backbone['date_block_num'] = self.target_months[0] 
+        feats = self.generate_features()
+        return test_backbone.merge(feats, how='left').fillna(0)
