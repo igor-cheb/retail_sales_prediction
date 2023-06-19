@@ -26,3 +26,6 @@ GROUP_COLS = {
     'item': ['item_id', 'date_block_num'],
     'shop_item': ['shop_id', 'item_id', 'date_block_num']
 }
+
+# Ho much zero target to include in train data, as percent of non-zero target
+ZERO_PERC = .8

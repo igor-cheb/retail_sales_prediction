@@ -15,6 +15,16 @@ def generate_backbone(cols_for_backbone: list[str]=['shop_id', 'item_id', 'date_
     index_backbone = pd.DataFrame(product(*ranges), columns = cols_for_backbone)
     return index_backbone
 
+def balance_zero_target(df: pd.DataFrame, 
+                        zero_perc: float,  # between 0 an 1, what percent of zero target to output
+                        target_col: str 
+                        ) -> pd.DataFrame:
+    """Subsamples rows with zero target to prevent the model to overfitting to 0"""
+    local_df = df.copy()
+    non_zero_df = local_df[local_df[target_col]!=0]
+    zero_df = local_df[local_df[target_col]==0].sample(int(non_zero_df.shape[0] * zero_perc))
+    return pd.concat([non_zero_df, zero_df], ignore_index=True)
+
 def run_cv(df: pd.DataFrame, 
            months_cv_split: TimeSeriesSplit, 
            model: Any,

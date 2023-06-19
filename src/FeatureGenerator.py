@@ -1,8 +1,8 @@
 from typing import  Optional
 import pandas as pd
 
-from src.utilities import generate_backbone
-from src.settings import PROCESSED_PATH, SHIFTS, WINS, ROLL_FUNCS, COLS_MIN_MAX, GROUP_COLS
+from src.utilities import generate_backbone, balance_zero_target
+from src.settings import PROCESSED_PATH, SHIFTS, WINS, ROLL_FUNCS, COLS_MIN_MAX, GROUP_COLS, ZERO_PERC
 
 class FeatureGenerator():
     """Class to generate all features used for training or inference"""
@@ -87,9 +87,12 @@ class FeatureGenerator():
 
         out_cols = self.index_cols + self.target_col + self.shifted_cols + self.roll_cols
         if self.target_months:
-            return feats_df[feats_df['date_block_num'].isin(self.target_months)][out_cols]
+            out_df = feats_df[feats_df['date_block_num'].isin(self.target_months)][out_cols]
+            return balance_zero_target(df=out_df, zero_perc=ZERO_PERC, 
+                                       target_col=self.target_col[0])
         else: 
-            return feats_df[out_cols]
+            return balance_zero_target(df=feats_df[out_cols], zero_perc=ZERO_PERC, 
+                                       target_col=self.target_col[0])
     
     def add_features_to_backbone(self,
                                  test_backbone: pd.DataFrame) -> pd.DataFrame:
