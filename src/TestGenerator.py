@@ -13,60 +13,8 @@
 #     # generate_all_targets and generate_target_for_month
 #     # then pass it along with FeatureGenerator and merge it here
 
-#     def __init__(self, train: bool=False):
-#         # TODO: merged_df is read in FeatureGenerator too, should be optimised
-#         if train:
-#             self.merged_df = pd.read_parquet(PROCESSED_PATH + 'merged_train_df.parquet')
-#             self.merged_df = self.merged_df[self.merged_df['shop_id'].isin([26, 27, 28])]
-
-#     # 2 functions below are used for training only
-    
-#     def generate_all_targets(self) -> pd.DataFrame:
-#         """
-#         Function creates 1 month lookahead target for all possible combinations of 
-#         shops, items and months. Used for training only.
-#         """
-#         # TODO: consider saving result of this function and reading it in init if train=True is passed
-
-#         # creating groupping for particular month, shop and item
-#         grouping_cols = ['shop_id', 'item_id', 'date_block_num']
-#         target_df = self.merged_df[grouping_cols + ['item_cnt_day']].sort_values(grouping_cols)
-#         target_df = target_df.groupby(grouping_cols)['item_cnt_day'].sum().reset_index()\
-#                         .rename(columns={'item_cnt_day':'sum_sales_cnt'})
-
-#         # generating backbone with all combinations of the index columns
-#         index_backbone = generate_backbone()
-
-#         # merging aggregated initial df with the backbone to calculate target correctly
-#         extended_target_df = index_backbone.merge(target_df, how='left', on=grouping_cols).fillna(0)
-#         extended_target_df = extended_target_df.sort_values(grouping_cols)
-
-#         # grouping by shop_id and item_id and shifting by 1 row "into the future"
-#         extended_target_df['target'] = extended_target_df.groupby(grouping_cols[:-1])['sum_sales_cnt'].shift(-1)
-#         return extended_target_df
-
-#     def generate_target_for_month(self, month_nums: list[int]) -> pd.DataFrame:
-#         """Function to generate target column for particular month. Used for training only."""
-#         # generating all possible targets
-#         all_target = self.generate_all_targets()
-        
-#         # because we are predicting for next month, 
-#         # we are picking only rows with current month equal to target month-1
-#         months_before_target = [el-1 for el in month_nums]
-#         all_target = all_target[all_target['date_block_num'].isin(months_before_target)]
-
-#         # including rows with zero and non-zero target 
-#         # to equal extent not to overfit the model to either
-#         all_target = pd.concat(
-#             [all_target[all_target['target']>0], 
-#             all_target[all_target['target']==0].sample(all_target[all_target['target']>0].shape[0])],
-#             ignore_index=True
-#         )
-        
-#         return all_target
-
-#     # 2 functions below are used for inference only
-
+#     def __init__(self):
+#         pass
 #     def add_month_to_backbone(self, 
 #                               shop_item_backbone: pd.DataFrame, 
 #                               month_num: int) -> pd.DataFrame:
