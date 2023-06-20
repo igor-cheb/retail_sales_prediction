@@ -84,11 +84,10 @@ class FeatureGenerator():
         out_cols = self.index_cols + self.cat_col + self.shifted_cols + self.roll_cols + self.target_col
 
         out_df = feats_df[out_cols]
-        if balance_target_by_zero:
-            return balance_zero_target(df=out_df, zero_perc=ZERO_PERC, 
-                                       target_col=self.target_col[0])
-        else: 
-            return out_df
+        
+        return out_df if not balance_target_by_zero else balance_zero_target(df=out_df, 
+                                                                             zero_perc=ZERO_PERC, 
+                                                                             target_col=self.target_col[0])
 
     def add_features_to_backbone(self,
                                  test_backbone: pd.DataFrame,
