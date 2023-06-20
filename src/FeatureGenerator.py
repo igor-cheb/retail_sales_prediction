@@ -17,8 +17,8 @@ class FeatureGenerator():
         self.target_months = target_months
         # if test data is generated for particular months, we want to make sure
         # that those months are in the min max range of COLS_MIN_MAX
-        if target_months:
-            new_max_month = max(target_months)
+        if self.target_months:
+            new_max_month = max(self.target_months)
             new_min_month = min([new_max_month, COLS_MIN_MAX['date_block_num'][0]])
             COLS_MIN_MAX['date_block_num'] = (new_min_month, new_max_month)
 
@@ -81,30 +81,37 @@ class FeatureGenerator():
             self.roll_cols.append(new_name)
         return local_df
     
-    def generate_features(self) -> pd.DataFrame:
+    def generate_features(self, balance_target_by_zero: bool=True) -> pd.DataFrame:
         """Calculating all features and merging them in one dataset"""
         feats_df = self._gen_base_features()
         feats_df = self._add_shifts(df=feats_df, 
                                     cols_to_shift=self.base_feat_cols + self.target_col)
         feats_df = self._add_rolling_windows(df=feats_df)
-
         out_cols = self.index_cols + self.cat_col + self.shifted_cols + self.roll_cols + self.target_col
+
         if self.target_months:
-            # TODO: this won't work for new month test data, needs fixing
-            out_df = feats_df[feats_df['date_block_num'].isin(self.target_months)][out_cols]
+            cond = feats_df['date_block_num'].isin(self.target_months)    
+            out_df = feats_df[cond][out_cols]
+        else:
+            out_df = feats_df[out_cols]
+        if balance_target_by_zero:
             return balance_zero_target(df=out_df, zero_perc=ZERO_PERC, 
                                        target_col=self.target_col[0])
         else: 
-            return balance_zero_target(df=feats_df[out_cols], zero_perc=ZERO_PERC, 
-                                       target_col=self.target_col[0])
-    
+            return out_df
+
     def add_features_to_backbone(self,
                                  test_backbone: pd.DataFrame) -> pd.DataFrame:
         """
         Function takes in test backbone, i.e. df of shops and items, 
         calls feature generator and returns the merged result.
+        Used to generate features for data/raw/test.csv.
         """
         if self.target_months:
             test_backbone['date_block_num'] = self.target_months[0] 
-        feats = self.generate_features()
+
+        feats = self.generate_features(balance_target_by_zero=False)
+        # TODO: 
+        # this merge needs to be done based on the columns used when groups 
+        # of features were created, not on all index
         return test_backbone.merge(feats, how='left').fillna(0)
