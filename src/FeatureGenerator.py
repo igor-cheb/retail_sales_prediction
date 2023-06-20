@@ -6,16 +6,13 @@ from src.settings import PROCESSED_PATH, SHIFTS, WINS, ROLL_FUNCS, COLS_MIN_MAX,
 
 class FeatureGenerator():
     """Class to generate all features used for training or inference"""
-
-    # TODO: join categories column
-    # TODO: add features to describe how many items were bought of the same category, shifts and rolls
-    
     def __init__(self, target_months: Optional[list]=None):
         self.merged_df = pd.read_parquet(PROCESSED_PATH + 'merged_train_df.parquet')
-
-        self.index_cols: list[str] = ['shop_id', 'item_id', 'date_block_num']
-        self.base_cols: list[str] = ['item_price', 'item_cnt_day']
-        self.target_col: list[str] = ['target']
+        
+        self.index_cols = ['shop_id', 'item_id', 'date_block_num']
+        self.base_cols =  ['item_price', 'item_cnt_day']
+        self.target_col = ['target']
+        self.cat_col =    ['item_category_id']
 
         self.target_months = target_months
         # if test data is generated for particular months, we want to make sure
@@ -24,12 +21,16 @@ class FeatureGenerator():
             new_max_month = max(target_months)
             new_min_month = min([new_max_month, COLS_MIN_MAX['date_block_num'][0]])
             COLS_MIN_MAX['date_block_num'] = (new_min_month, new_max_month)
-        self.backbone = generate_backbone(cols_min_max=COLS_MIN_MAX)
+
+        # TODO: take item-category mapping from raw file instead
+        item_cat_map = self.merged_df[['item_id', 'item_category_id']].drop_duplicates()
+        self.backbone = generate_backbone(cols_min_max=COLS_MIN_MAX).merge(item_cat_map, how='left')
     
     def _gen_base_features(self) -> pd.DataFrame:
         """Adding shop_id level feature aggregates"""
-        local_df = self.merged_df[['date_block_num', 'item_id', 'shop_id', 
-                                   'item_cnt_day', 'item_price']].reset_index(drop=True).copy()
+        local_df = self.merged_df[['date_block_num', 'item_id', 
+                                   'shop_id', 'item_cnt_day', 
+                                   'item_price', 'item_category_id']].reset_index(drop=True).copy()
 
         res_df = self.backbone.copy()
         agg_di = {col: ROLL_FUNCS for col in self.base_cols}
@@ -41,7 +42,8 @@ class FeatureGenerator():
 
         res_df = res_df.rename(columns={'item_cnt_day_sum_per_shop_item': 'target'})
         self.base_feat_cols = [str(col) for col in res_df if col not in 
-                                          self.index_cols + self.base_cols + self.target_col]
+                               self.index_cols + self.base_cols + 
+                               self.target_col + self.cat_col]
         return res_df
 
     def _add_shifts(self, 
@@ -86,8 +88,9 @@ class FeatureGenerator():
                                     cols_to_shift=self.base_feat_cols + self.target_col)
         feats_df = self._add_rolling_windows(df=feats_df)
 
-        out_cols = self.index_cols + self.target_col + self.shifted_cols + self.roll_cols
+        out_cols = self.index_cols + self.cat_col + self.shifted_cols + self.roll_cols + self.target_col
         if self.target_months:
+            # TODO: this won't work for new month test data, needs fixing
             out_df = feats_df[feats_df['date_block_num'].isin(self.target_months)][out_cols]
             return balance_zero_target(df=out_df, zero_perc=ZERO_PERC, 
                                        target_col=self.target_col[0])
