@@ -8,6 +8,7 @@ class FeatureGenerator():
     """Class to generate all features used for training or inference"""
 
     # TODO: join categories column
+    # TODO: add features to describe how many items were bought of the same category, shifts and rolls
     
     def __init__(self, target_months: Optional[list]=None):
         self.merged_df = pd.read_parquet(PROCESSED_PATH + 'merged_train_df.parquet')
