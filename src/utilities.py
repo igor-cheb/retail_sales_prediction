@@ -7,6 +7,12 @@ from sklearn.model_selection import TimeSeriesSplit
 
 from src.settings import COLS_MIN_MAX, SHIFTS, WINS
 
+def construct_cols_min_max(dfs: list[pd.DataFrame], 
+                           cols: list[str]) -> dict:
+    """Creates a dictionary of min max values of passed columns and passed datasets"""
+    return {col: (min([el_df[col].min() for el_df in dfs]),
+                  max([el_df[col].max() for el_df in dfs])) for col in cols}
+
 def generate_backbone(cols_for_backbone: list[str]=['shop_id', 'item_id', 'date_block_num'],
                       cols_min_max: dict=COLS_MIN_MAX
                      ) -> pd.DataFrame:
