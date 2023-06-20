@@ -105,10 +105,11 @@ class FeatureGenerator():
         """
         Function takes in test backbone, i.e. df of shops and items, 
         calls feature generator and returns the merged result.
+        Used to generate features for data/raw/test.csv.
         """
         if self.target_months:
             test_backbone['date_block_num'] = self.target_months[0] 
-        
+
         feats = self.generate_features(balance_target_by_zero=False)
         # TODO: 
         # this merge needs to be done based on the columns used when groups 
