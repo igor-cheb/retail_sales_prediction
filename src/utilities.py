@@ -35,6 +35,8 @@ def run_cv(df: pd.DataFrame,
     over the passed df with all features and month column and passed
     splitter by months
     """
+    # TODO: Control for the percentage of new customers and shops in the test data not seen in training
+
     all_months = np.array(sorted(df['date_block_num'].unique()))
     all_months = all_months[all_months >= max([max(SHIFTS), max(WINS)])]# leaving enough months for longest shift/window calculation
     cv_results = {'rmse':[], 'nrmse':[], 'train_months':[], 
