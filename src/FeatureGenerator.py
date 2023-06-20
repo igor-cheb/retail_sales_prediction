@@ -105,4 +105,4 @@ class FeatureGenerator():
                                                  custom_cols_min_max['date_block_num'][1])
         feats_df = self.generate_features(cols_min_max=custom_cols_min_max, 
                                           balance_target_by_zero=False)
-        return test_backbone.merge(feats_df, how='left').fillna(0)
+        return test_backbone.merge(feats_df.drop(self.target_col[0], axis=1), how='left').fillna(0)
