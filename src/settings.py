@@ -13,7 +13,7 @@ ROLL_FUNCS = ['sum', 'mean'] #, 'mean', 'std', 'min', 'max'
 
 # min and max for months and IDs of shops and items. Extracted from respective raw files
 COLS_MIN_MAX = {
-    'shop_id':        (26, 28),#(0, 59), 
+    'shop_id':        (26, 28),#(0, 59)
     'item_id':        (0, 22169),
     'date_block_num': (0, 33)
 }
