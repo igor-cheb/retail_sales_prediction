@@ -12,13 +12,14 @@ class StackModel():
                  lvl_1_feats: list,
                  target_col: str,
                  train_ratio: float=.6, # data volume percentage used by 1st level models over 2nd lvl model
-                 ):
+                 verbose: bool=False):
         self.lvl_1_models = lvl_1_models
         self.lvl_2_models = lvl_2_models
         self.month_col = month_col
         self.train_ratio = train_ratio
         self.lvl_1_feats = lvl_1_feats
         self.target_col = target_col
+        self.verbose = verbose
 
     def _fit_all_models(self, models: list, 
                         df: pd.DataFrame, 
@@ -27,7 +28,7 @@ class StackModel():
         for i, model in enumerate(models):
             model.fit(df, label_col)
             fitted_models.append(model)
-            print(f'model {i} training done')
+            if self.verbose: print(f'model {i} training done')
         return fitted_models
 
     def _train_1_lvl(self, models: list, 
@@ -42,25 +43,22 @@ class StackModel():
         all_pred = [] # next_months = []; 
         train_cols = [col for col in df if col!=months_col]
         for train_index, test_index in splitter.split(all_months):
-            print(all_months[train_index])
-            print(all_months[test_index])
-            # next_months.append(all_months[test_index])
+            if self.verbose: 
+                print(all_months[train_index])
+                print(all_months[test_index])
 
             X_train = df[df[months_col].isin(all_months[train_index])][train_cols]
             X_test = df[df[months_col].isin(all_months[test_index])][train_cols]
-            y_train = label_col[df[months_col].isin(all_months[train_index])]#.values.ravel()
-            y_test = label_col[df[months_col].isin(all_months[test_index])]#.values.ravel()
-            # X_train, X_test, y_train, y_test = df_train, df_test, \
-            #     label_col.values.ravel(), label_col.values.ravel()
+            y_train = label_col[df[months_col].isin(all_months[train_index])]
+            y_test = label_col[df[months_col].isin(all_months[test_index])]
 
             pred = np.array([all_months[test_index]] * X_test.shape[0])
             for i, model in enumerate(models):
                 model.fit(X_train, y_train)
-                print(f'model {i} training done')
+                if self.verbose: print(f'model {i} training done')
                 pred = np.column_stack([pred, model.predict(X_test)])
             pred = np.column_stack([pred, y_test])
             all_pred.append(pred)
-        # next_months = np.array(next_months).flatten()
         feats_cols = [f'model_{k}' for k in range(len(models))]
         out_columns = [months_col] + feats_cols + [label_col_name]
 
@@ -93,7 +91,6 @@ class StackModel():
                                                     df=pred_for_lvl_2[train_cols_lvl_2],
                                                     label_col=pred_for_lvl_2[self.target_col]
                                                     )
-        print(self.fitted_models_2)
 
     def predict(self, X: pd.DataFrame):
         pred = []; cols_lvl_2 = []

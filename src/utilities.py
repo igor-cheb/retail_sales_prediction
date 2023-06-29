@@ -57,7 +57,7 @@ def run_cv(df: pd.DataFrame,
         test_df = df[df['date_block_num'].isin(test_months)]
         cols_to_fit = ['date_block_num'] + cols_di['feats'] if type(model) == StackModel else cols_di['feats']
         model.fit(X=train_df[cols_to_fit], 
-                  y=train_df[cols_di['target']])
+                  y=train_df[cols_di['target']].values.ravel())
         y_true = test_df[cols_di['target']].values
         y_pred = model.predict(test_df[cols_di['feats']])
         
