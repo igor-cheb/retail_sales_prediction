@@ -5,6 +5,7 @@ from itertools import product
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import TimeSeriesSplit
 
+from src.StackModel import StackModel
 from src.settings import COLS_MIN_MAX, SHIFTS, WINS
 
 def construct_cols_min_max(dfs: list[pd.DataFrame], 
@@ -47,17 +48,18 @@ def run_cv(df: pd.DataFrame,
     all_months = all_months[all_months >= max([max(SHIFTS), max(WINS)])]# leaving enough months for longest shift/window calculation
     cv_results = {'rmse':[], 'nrmse':[], 'train_months':[], 
                   'test_months':[], 'train_data':[], 'test_data':[], 'pred':[]}
-
+    
     for i, (train_index, test_index) in enumerate(months_cv_split.split(all_months)):
         train_months = all_months[train_index]
         test_months = all_months[test_index]
         
         train_df = df[df['date_block_num'].isin(train_months)]
         test_df = df[df['date_block_num'].isin(test_months)]
-
-        model.fit(X=train_df[cols_di['feats']], y=train_df[cols_di['target']])
+        cols_to_fit = ['date_block_num'] + cols_di['feats'] if type(model) == StackModel else cols_di['feats']
+        model.fit(X=train_df[cols_to_fit], 
+                  y=train_df[cols_di['target']].values.ravel())
         y_true = test_df[cols_di['target']].values
-        y_pred = model.predict(X=test_df[cols_di['feats']])
+        y_pred = model.predict(test_df[cols_di['feats']])
         
         rmse = mean_squared_error(y_true=y_true, y_pred=y_pred)**(.5)
         nrmse = rmse / np.std(y_true) # (np.percentile(y_true, 75) - np.percentile(y_true, 25))
