@@ -59,6 +59,7 @@ class StackModel():
             for i, model in enumerate(models):
                 model.fit(X_train, y_train)
                 if self.verbose: print(f'model {i} training done')
+                # TODO: verify that the merging here is done correctly
                 pred = np.column_stack([pred, model.predict(X_test)])
             pred = np.column_stack([pred, y_test])
             all_pred.append(pred)
