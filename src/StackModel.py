@@ -21,12 +21,11 @@ class StackModel():
         self.target_col = target_col
 
     def _fit_all_models(self, models: list, 
-                    df: pd.DataFrame, 
-                    label_col: pd.Series):
-        X_train, y_train = df, label_col#.values.ravel()
+                        df: pd.DataFrame, 
+                        label_col: pd.Series):
         fitted_models = []
         for i, model in enumerate(models):
-            model.fit(X_train, y_train)
+            model.fit(df, label_col)
             fitted_models.append(model)
             print(f'model {i} training done')
         return fitted_models
@@ -103,7 +102,11 @@ class StackModel():
             cols_lvl_2.append(f'model_{i}')
         lvl_1_pred = pd.DataFrame(np.column_stack(pred), columns=cols_lvl_2)
         pred = []
-        for model in self.fitted_models_2:
-            pred.append(model.predict(lvl_1_pred))
-        lvl_2_pred = np.column_stack(pred)
+
+        if self.fitted_models_2:
+            for model in self.fitted_models_2:
+                pred.append(model.predict(lvl_1_pred))
+            lvl_2_pred = np.column_stack(pred).mean(axis=1)
+        else:
+            lvl_2_pred = lvl_1_pred.mean(axis=1)
         return lvl_2_pred

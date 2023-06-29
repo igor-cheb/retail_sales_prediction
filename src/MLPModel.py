@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import torch
 
-class NNModel(torch.nn.Module):
+class MLPModel(torch.nn.Module):
     def __init__(self, input_size: int, epochs=3, batch_size=512):
         super().__init__()
         self.epochs = epochs
