@@ -5,6 +5,7 @@ import numpy as np
 from src.settings import SHIFTS, WINS
 
 class StackModel():
+    """Class to stack models in several layers for time series data"""
     def __init__(self, 
                  lvl_1_models: list, 
                  lvl_2_models: list,
@@ -23,7 +24,8 @@ class StackModel():
 
     def _fit_all_models(self, models: list, 
                         df: pd.DataFrame, 
-                        label_col: pd.Series):
+                        label_col: pd.Series) -> list:
+        """Function fits all passed models to the passed data and returnes trained models"""
         fitted_models = []
         for i, model in enumerate(models):
             model.fit(df, label_col)
@@ -37,7 +39,8 @@ class StackModel():
                     df: pd.DataFrame, 
                     label_col: pd.Series,
                     label_col_name: str,
-                    months_col: str):
+                    months_col: str) -> tuple[list, pd.DataFrame]:
+        """Function trains base models of a stacked arch"""
         
         # generating predictions for next lvl models through rolling window CV
         all_pred = [] # next_months = []; 
@@ -69,6 +72,7 @@ class StackModel():
         return fitted_models, pd.DataFrame(np.vstack(all_pred), columns=out_columns)
 
     def fit(self, X: pd.DataFrame, y: pd.Series):
+        """Method to fit the stacked model to the passed data"""
         all_months = np.array(sorted(X[self.month_col].unique()))
         all_months = all_months[all_months >= max([max(SHIFTS), max(WINS)])]# leaving enough months for longest shift/window calculation
         train_size_1 = int(len(all_months) * self.train_ratio)
@@ -92,7 +96,8 @@ class StackModel():
                                                     label_col=pred_for_lvl_2[self.target_col]
                                                     )
 
-    def predict(self, X: pd.DataFrame):
+    def predict(self, X: pd.DataFrame) -> pd.Series:
+        """Method to predict using stacked model"""
         pred = []; cols_lvl_2 = []
         for i, model in enumerate(self.fitted_models_1):
             pred.append(model.predict(X[self.lvl_1_feats]))
