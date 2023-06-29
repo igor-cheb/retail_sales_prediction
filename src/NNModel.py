@@ -24,10 +24,10 @@ class NNModel(torch.nn.Module):
         for _ in range(self.epochs):
             print(f'epoch: {_}')
             for i in range(0, X.shape[0], self.batch_size):
-                ixs = range(i, min([X.shape[0], i + self.batch_size]))
+                ixs = np.array(range(i, min([X.shape[0], i + self.batch_size])))
                 batch_X = loc_X[ixs]
                 batch_y = loc_y[ixs]
-                pred = self.layers(batch_X)
+                pred = self.layers(batch_X).flatten()
                 loss = torch.nn.functional.l1_loss(input=pred, 
                                                    target=batch_y)
                 self.optim.zero_grad()
