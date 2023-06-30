@@ -5,12 +5,11 @@ from src.utilities import generate_backbone, balance_zero_target, construct_cols
 from src.settings import PROCESSED_PATH, SHIFTS, WINS, ROLL_FUNCS, COLS_MIN_MAX, GROUP_COLS, ZERO_PERC
 
 class FeatureGenerator():
-    """Class to generate all features used for training or inference"""
-
+    """Class to generate all features used for training or inference."""
+    
     #TODO: consider adding difference between lags and/or rolls as features
     
-    def __init__(self, 
-                 ):
+    def __init__(self):
         self.merged_df = pd.read_parquet(PROCESSED_PATH + 'merged_train_df.parquet')
         
         self.index_cols = ['shop_id', 'item_id', 'date_block_num']
