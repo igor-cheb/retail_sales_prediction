@@ -4,7 +4,7 @@ import numpy as np
 class ToyModel():
     """Baseline model that predicts mean of the passed y vector at train time"""
 
-    def fit(self, X: pd.DataFrame, y: pd.DataFrame):
+    def fit(self, X: pd.DataFrame, y: np.ndarray):
         self.y_mean = y.mean()
 
     def predict(self, X):
