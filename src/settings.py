@@ -4,6 +4,9 @@ RAW_PATH = 'data/raw/'
 # path to processed data folder
 PROCESSED_PATH = 'data/processed/'
 
+# batched processed data
+BATCH_FEATS_PATH = PROCESSED_PATH + 'feats_df_batches/'
+
 #length of windows and shifts
 SHIFTS = [1, 2, 3, 8, 12]
 WINS = [2, 5, 12]
@@ -13,7 +16,7 @@ ROLL_FUNCS = ['sum', 'mean'] #, 'mean', 'std', 'min', 'max'
 
 # min and max for months and IDs of shops and items. Extracted from respective raw files
 COLS_MIN_MAX = {
-    'shop_id':        (26, 28), #(26, 28), (2, 59)
+    'shop_id':        (0, 59), #(26, 28), (2, 59)
     'item_id':        (0, 22169), #(30, 22167)
     'date_block_num': (0, 33)
 }
@@ -29,3 +32,6 @@ GROUP_COLS = {
 
 # Ho much zero target to include in train data, as percent of non-zero target
 ZERO_PERC = .8
+
+# batch size for features processing
+SHOPS_BATCH_SIZE = 10

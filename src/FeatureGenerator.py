@@ -1,18 +1,24 @@
-from typing import  Optional
+import gc
 import pandas as pd
 
-from src.utilities import generate_backbone, balance_zero_target, construct_cols_min_max
+from src.utilities import generate_backbone, balance_zero_target, construct_cols_min_max, \
+    reduce_df_memory, check_folder
 from src.settings import PROCESSED_PATH, RAW_PATH, SHIFTS, WINS, ROLL_FUNCS, \
-    COLS_MIN_MAX, GROUP_COLS, ZERO_PERC
+    COLS_MIN_MAX, GROUP_COLS, ZERO_PERC, SHOPS_BATCH_SIZE, BATCH_FEATS_PATH
 
 class FeatureGenerator():
     """Class to generate all features used for training or inference."""
 
     #TODO: consider adding difference between lags and/or rolls as features
     
-    def __init__(self):
+    def __init__(self, verbose: bool=False, save_files: bool=True):
+        self.save_files = save_files
+        self.verbose = verbose
+
+        # reading file with raw data
         self.merged_df = pd.read_parquet(PROCESSED_PATH + 'merged_train_df.parquet')
         
+        # creating lists of default columns
         self.index_cols = ['shop_id', 'item_id', 'date_block_num']
         self.base_cols =  ['item_price', 'item_cnt_day']
         self.target_col = ['target']
@@ -21,6 +27,9 @@ class FeatureGenerator():
         # creating item-category mapping
         item_cat_df = pd.read_csv(RAW_PATH + 'items.csv')
         self.item_cat_map = item_cat_df[['item_id', 'item_category_id']].drop_duplicates()
+
+        # creating or cleaning folder for processed data
+        if self.save_files: check_folder(BATCH_FEATS_PATH)
 
     def _gen_base_features(self, backbone) -> pd.DataFrame:
         """Adding shop_id level feature aggregates"""
@@ -42,8 +51,7 @@ class FeatureGenerator():
                                self.target_col + self.cat_col]
         return res_df
 
-    def _add_shifts(self, 
-                    df: pd.DataFrame, 
+    def _add_shifts(self, df: pd.DataFrame, 
                     cols_to_shift: list[str]) -> pd.DataFrame:
         """Adding lag features to the passed df based on passed shift_cols columns"""
         self.shifted_cols = []
@@ -57,8 +65,7 @@ class FeatureGenerator():
             df = df.merge(preshift_df, how='left', on=self.index_cols).fillna(0)
         return df
 
-    def _add_rolling_windows(self,
-                             df: pd.DataFrame) -> pd.DataFrame:
+    def _add_rolling_windows(self, df: pd.DataFrame) -> pd.DataFrame:
         """Adding window aggregates to the passed df based on passed cols_to_agg columns"""
         local_df = df.copy()
         self.roll_cols = []
@@ -77,25 +84,61 @@ class FeatureGenerator():
             self.roll_cols.append(new_name)
         return local_df
     
-    def generate_features(self, 
-                          cols_min_max: dict=COLS_MIN_MAX,
+    def generate_features(self, cols_min_max: dict=COLS_MIN_MAX,
                           balance_target_by_zero: bool=True) -> pd.DataFrame:
         """Calculating all features and merging them in one dataset"""
+
+        # generating base features
         backbone = generate_backbone(cols_min_max=cols_min_max).merge(self.item_cat_map, how='left')
         feats_df = self._gen_base_features(backbone=backbone)
-        feats_df = self._add_shifts(df=feats_df, 
-                                    cols_to_shift=self.base_feat_cols + self.target_col)
-        feats_df = self._add_rolling_windows(df=feats_df)
-        out_cols = self.index_cols + self.cat_col + self.shifted_cols + self.roll_cols + self.target_col
+        feats_df = reduce_df_memory(feats_df)
+        del backbone
+        if self.verbose: print('base feats done')
 
-        out_df = feats_df[out_cols]
-        
-        return out_df if not balance_target_by_zero else balance_zero_target(df=out_df, 
-                                                                             zero_perc=ZERO_PERC, 
-                                                                             target_col=self.target_col[0])
+        # calculating number of batches for further processing
+        shops = feats_df['shop_id'].unique()
+        batches_num = len(shops) // SHOPS_BATCH_SIZE; 
+        if (len(shops) % SHOPS_BATCH_SIZE) > 0: batches_num += 1
+        if self.verbose: print(f'{batches_num} batches')
 
-    def add_features_to_backbone(self,
-                                 test_backbone: pd.DataFrame,
+        all_out_dfs = []
+        # iteration over batches
+        for cnt, ix in enumerate(range(0, len(shops), SHOPS_BATCH_SIZE), start=1):
+            cur_shops = shops[ix:ix + SHOPS_BATCH_SIZE]
+            loc_feats_df = feats_df[feats_df['shop_id'].isin(cur_shops)].copy()
+
+            # adding lag features
+            loc_feats_df = self._add_shifts(df=loc_feats_df, 
+                                            cols_to_shift=self.base_feat_cols + self.target_col)
+            if self.verbose: print('shifts done')
+
+            # adding rolling window features
+            loc_feats_df = self._add_rolling_windows(df=loc_feats_df)
+            if self.verbose: print('rolls done')
+            out_cols = self.index_cols + self.cat_col + self.shifted_cols + self.roll_cols + self.target_col
+            loc_feats_df = reduce_df_memory(loc_feats_df)
+
+            # filtering positive target and balancing it with 0 target rows
+            if balance_target_by_zero:
+                batch_df = balance_zero_target(df=loc_feats_df[out_cols], 
+                                                zero_perc=ZERO_PERC, 
+                                                target_col=self.target_col[0])
+            else:
+                batch_df = loc_feats_df[out_cols]
+            all_out_dfs.append(batch_df)
+
+            # saving current batch
+            if self.save_files: 
+                batch_df.to_parquet(BATCH_FEATS_PATH + f'feats_df_batch_{cnt}.parquet')
+            if self.verbose:
+                print(f'batch {cnt}/{batches_num} done')
+                print('-'*30)
+        if self.verbose: print('concatenating')
+        gc.collect()
+        out_df = pd.concat(all_out_dfs, ignore_index=True)
+        return out_df 
+
+    def add_features_to_backbone(self,test_backbone: pd.DataFrame,
                                  target_month: int) -> pd.DataFrame:
         """
         Function takes in test backbone, i.e. df of shops and items, 
