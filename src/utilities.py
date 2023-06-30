@@ -1,11 +1,13 @@
-import pandas as pd
+import os
+import glob
 import numpy as np
+import pandas as pd
+
 from typing import Any
 from itertools import product
+from src.StackModel import StackModel
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import TimeSeriesSplit
-
-from src.StackModel import StackModel
 from src.settings import COLS_MIN_MAX, SHIFTS, WINS
 
 def construct_cols_min_max(dfs: list[pd.DataFrame], 
@@ -13,6 +15,14 @@ def construct_cols_min_max(dfs: list[pd.DataFrame],
     """Creates a dictionary of min max values of passed columns and passed datasets"""
     return {col: (min([el_df[col].min() for el_df in dfs]),
                   max([el_df[col].max() for el_df in dfs])) for col in cols}
+
+def check_folder(path: str, flash_folder: bool=True):
+    """Function checks if path exists and creates folder if it does not"""
+    if not os.path.exists(path):
+        os.mkdir(path) 
+    elif flash_folder:
+        for filename in glob.glob(path + '/*'):
+            os.remove(filename)
 
 def generate_backbone(cols_for_backbone: list[str]=['shop_id', 'item_id', 'date_block_num'],
                       cols_min_max: dict=COLS_MIN_MAX
@@ -31,6 +41,15 @@ def balance_zero_target(df: pd.DataFrame,
     non_zero_df = local_df[local_df[target_col]!=0]
     zero_df = local_df[local_df[target_col]==0].sample(int(non_zero_df.shape[0] * zero_perc))
     return pd.concat([non_zero_df, zero_df], ignore_index=True)
+
+def reduce_df_memory(df: pd.DataFrame):
+    """Function casts down column types"""
+    for col in df:
+        if df[col].dtype == 'int64':
+            df.loc[:, col] = df[col].astype('int32')
+        elif df[col].dtype == 'float64':
+            df.loc[:, col] = df[col].astype('float32')
+    return df
 
 def run_cv(df: pd.DataFrame, 
            months_cv_split: TimeSeriesSplit, 
