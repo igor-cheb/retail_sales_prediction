@@ -8,7 +8,7 @@ PROCESSED_PATH = 'data/processed/'
 BATCH_FEATS_PATH = PROCESSED_PATH + 'feats_df_batches/'
 
 # saved predictions
-PREDS_PATH = PROCESSED_PATH + 'predictions/'
+PREDS_PATH = 'data/predictions/'
 
 #length of windows and shifts
 SHIFTS = [1, 2, 3, 8, 12]
