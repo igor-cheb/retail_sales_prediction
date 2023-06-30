@@ -2,11 +2,12 @@ from typing import  Optional
 import pandas as pd
 
 from src.utilities import generate_backbone, balance_zero_target, construct_cols_min_max
-from src.settings import PROCESSED_PATH, SHIFTS, WINS, ROLL_FUNCS, COLS_MIN_MAX, GROUP_COLS, ZERO_PERC
+from src.settings import PROCESSED_PATH, RAW_PATH, SHIFTS, WINS, ROLL_FUNCS, \
+    COLS_MIN_MAX, GROUP_COLS, ZERO_PERC
 
 class FeatureGenerator():
     """Class to generate all features used for training or inference."""
-    
+
     #TODO: consider adding difference between lags and/or rolls as features
     
     def __init__(self):
@@ -16,8 +17,10 @@ class FeatureGenerator():
         self.base_cols =  ['item_price', 'item_cnt_day']
         self.target_col = ['target']
         self.cat_col =    ['item_category_id']
-        # TODO: take item-category mapping from raw file instead
-        self.item_cat_map = self.merged_df[['item_id', 'item_category_id']].drop_duplicates()
+
+        # creating item-category mapping
+        item_cat_df = pd.read_csv(RAW_PATH + 'items.csv')
+        self.item_cat_map = item_cat_df[['item_id', 'item_category_id']].drop_duplicates()
 
     def _gen_base_features(self, backbone) -> pd.DataFrame:
         """Adding shop_id level feature aggregates"""
