@@ -12,7 +12,6 @@ Project structure:
     <li>ETL: sandbox notebook for development and testing of feature engineering and cross validation </li>
     <li>modelling: sandbox for modelling experiments</li>
     <li>kaggle_submission: notebook to generate kaggle submissions</li>
-        
     </ul>
 </ul>
 
