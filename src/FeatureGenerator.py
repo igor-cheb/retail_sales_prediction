@@ -20,9 +20,9 @@ class FeatureGenerator():
         
         # creating lists of default columns
         self.index_cols = ['shop_id', 'item_id', 'date_block_num']
-        self.base_cols =  ['item_price', 'item_cnt_day']
+        self.base_cols  = ['item_price', 'item_cnt_day']
         self.target_col = ['target']
-        self.cat_col =    ['item_category_id']
+        self.cat_col    = ['item_category_id']
 
         # creating item-category mapping
         item_cat_df = pd.read_csv(RAW_PATH + 'items.csv')
@@ -57,7 +57,7 @@ class FeatureGenerator():
         self.shifted_cols = []
         for shift in SHIFTS:
             preshift_df = df[self.index_cols + cols_to_shift].copy()
-            preshift_df['date_block_num'] = preshift_df['date_block_num'] + shift
+            preshift_df.loc[:, 'date_block_num'] = preshift_df['date_block_num'] + shift
             rename_dict = {col: f'{col}_lag_{shift}' for col in cols_to_shift}
             self.shifted_cols += [f'{col}_lag_{shift}' for col in cols_to_shift]
             preshift_df = preshift_df.rename(columns = rename_dict)
