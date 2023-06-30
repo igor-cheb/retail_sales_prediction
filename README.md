@@ -5,7 +5,7 @@ Implementation of a take home task as part of Honest bank recruitment process
 Project structure:
 <ul>
 <li>data: raw and processed data used for training and inference</li>
-<li>src: classes and settings used in modelling and data transformation</li>
+<li>src: classes, settings and utilities used in modelling and data transformation</li>
 <li>notebooks:</li>
     <ul>
     <li>EDA: short data exploration</li>
