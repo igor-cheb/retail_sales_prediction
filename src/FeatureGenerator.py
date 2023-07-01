@@ -90,7 +90,7 @@ class FeatureGenerator():
                           balance_target_by_zero: bool=True) -> pd.DataFrame:
         """Calculating all features and merging them in one dataset"""
 
-        # generating base features outside batching to get all the gorupings correctly
+        # generating base features outside batching to get all the groupings correctly
         backbone = generate_backbone(cols_min_max=cols_min_max).merge(self.item_cat_map, how='left')
         feats_df = self._gen_base_features(backbone=backbone)
         feats_df = reduce_df_memory(feats_df)
