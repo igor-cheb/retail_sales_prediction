@@ -1,8 +1,9 @@
 import gc
+import os
 import pandas as pd
 
 from src.utilities import generate_backbone, balance_zero_target, construct_cols_min_max, \
-    reduce_df_memory, check_folder
+    reduce_df_memory, check_folder, create_merged_raw
 from src.settings import PROCESSED_PATH, RAW_PATH, SHIFTS, WINS, ROLL_FUNCS, \
     COLS_MIN_MAX, GROUP_COLS, ZERO_PERC, SHOPS_BATCH_SIZE, BATCH_FEATS_PATH
 
@@ -15,7 +16,9 @@ class FeatureGenerator():
         self.save_files = save_files
         self.verbose = verbose
 
-        # reading file with raw data
+        # creating/reading file with raw data
+        if not os.path.exists(PROCESSED_PATH + 'merged_train_df.parquet'):
+            create_merged_raw()
         self.merged_df = pd.read_parquet(PROCESSED_PATH + 'merged_train_df.parquet')
         
         # creating lists of default columns

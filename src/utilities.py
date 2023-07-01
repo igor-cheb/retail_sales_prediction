@@ -8,7 +8,7 @@ from itertools import product
 from src.StackModel import StackModel
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import TimeSeriesSplit
-from src.settings import COLS_MIN_MAX, SHIFTS, WINS
+from src.settings import COLS_MIN_MAX, SHIFTS, WINS, RAW_PATH, PROCESSED_PATH
 
 def construct_cols_min_max(dfs: list[pd.DataFrame], 
                            cols: list[str]) -> dict:
@@ -51,6 +51,13 @@ def reduce_df_memory(df: pd.DataFrame):
             df.loc[:, col] = df[col].astype('float32')
     return df
 
+def create_merged_raw(raw_folder_path: str=RAW_PATH, merged_name: str='merged_train_df'):
+    """Function that merges and save raw files sales_train and items"""
+    sales_train = pd.read_csv(raw_folder_path + 'sales_train.csv')
+    items = pd.read_csv(raw_folder_path + 'items.csv')[['item_id', 'item_category_id']]
+    merged = sales_train.merge(items, how='left', on='item_id')
+    merged.to_parquet(PROCESSED_PATH + f'{merged_name}.parquet')
+    
 def run_cv(df: pd.DataFrame, 
            months_cv_split: TimeSeriesSplit, 
            model: Any,
