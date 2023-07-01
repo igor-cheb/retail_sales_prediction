@@ -2,7 +2,8 @@
 WORK IN PROGRESS </br>
 Implementation of a take home task as part of Honest bank recruitment process
 
-Before running any notebook, please put the raw data into the `data/raw/` folder 
+Before running any notebook, please put the raw data into the `data/raw/` folder </br>
+
 Project structure:
 <ul>
 <li>data: raw and processed data used for training and inference</li>
