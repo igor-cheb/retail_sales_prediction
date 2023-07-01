@@ -66,7 +66,9 @@ class FeatureGenerator():
         return df
 
     def _add_rolling_windows(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Adding window aggregates to the passed df based on passed cols_to_agg columns"""
+        """Adding mean window aggregate of the target column to the passed df"""
+        # TODO: consider adding window aggregates of other columns
+        # TODO: consider adding window aggregates grouped by item categories
         local_df = df.copy()
         self.roll_cols = []
         col = self.target_col[0]
