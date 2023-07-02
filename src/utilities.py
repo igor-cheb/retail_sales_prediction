@@ -16,6 +16,27 @@ def construct_cols_min_max(dfs: list[pd.DataFrame],
     return {col: (min([el_df[col].min() for el_df in dfs]),
                   max([el_df[col].max() for el_df in dfs])) for col in cols}
 
+def construct_fake_df(df_len: int=20000, 
+                      lookback_window: int=15,
+                      lags_list: list=[12, 8, 3, 2, 1]) -> tuple[pd.DataFrame, list]:
+    """Function creates artificial sequence dataset. Used to experiment with RNN"""
+    x = np.array(range(1, df_len))
+    # y = np.sin(x/10) + x/100
+    y = (np.sin(x/10)/x)*100 +  x/300
+
+    X = []
+    for ix, val in enumerate(y[:-(lookback_window-1)]):
+        X.append(y[ix: ix+(lookback_window+1)][::-1])
+    
+    feats_cols = [f'lag_{col+1}' for col in range(lookback_window)]
+    out_df = pd.DataFrame(X, columns=['target'] + feats_cols).dropna()
+    
+    if len(lags_list) > 0:
+        filtered_cols  = [col for col in feats_cols if col in [f'lag_{num}' for num in lags_list]][::-1]
+    else: 
+        filtered_cols = feats_cols
+    return out_df[['target'] + filtered_cols], filtered_cols
+
 def check_folder(path: str, flash_folder: bool=True):
     """Function checks if path exists and creates folder if it does not"""
     if not os.path.exists(path):
