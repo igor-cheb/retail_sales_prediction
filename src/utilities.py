@@ -8,7 +8,7 @@ from itertools import product
 from src.StackModel import StackModel
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import TimeSeriesSplit
-from src.settings import COLS_MIN_MAX, SHIFTS, WINS, RAW_PATH, PROCESSED_PATH
+from src.settings import COLS_MIN_MAX, SHIFTS, WINS, RAW_PATH, PROCESSED_PATH, BATCH_FEATS_PATH
 
 def construct_cols_min_max(dfs: list[pd.DataFrame], 
                            cols: list[str]) -> dict:
@@ -58,6 +58,14 @@ def create_merged_raw(raw_folder_path: str=RAW_PATH, merged_name: str='merged_tr
     merged = sales_train.merge(items, how='left', on='item_id')
     merged.to_parquet(PROCESSED_PATH + f'{merged_name}.parquet')
     
+def read_train() -> pd.DataFrame:
+    """Function reads and concats batched processed datasets with features"""
+    all_dfs = []
+    for path in glob.glob(BATCH_FEATS_PATH):
+        all_dfs.append(pd.read_parquet(path))
+    return pd.concat(all_dfs, ignore_index=True)
+
+
 def run_cv(df: pd.DataFrame, 
            months_cv_split: TimeSeriesSplit, 
            model: Any,
