@@ -2,6 +2,8 @@
 WORK IN PROGRESS </br>
 Implementation of a take home task as part of Honest bank recruitment process
 
+Pipfile is provided to install all packages used.
+
 Before running any notebook, please put the raw data into the `data/raw/` folder </br>
 
 Project structure:
