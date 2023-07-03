@@ -54,7 +54,7 @@ class RNNModel(torch.nn.Module):
         X = X.to(device=self.device)
         y = y.to(device=self.device)
 
-        for ix in tqdm(range(0, len(X), self.batch_size)):
+        for ix in range(0, len(X), self.batch_size):
             batch_X = X[ix : ix + self.batch_size]; batch_y = y[ix : ix + self.batch_size]
             rnn_output = self.forward(token=batch_X)
         
@@ -80,7 +80,6 @@ class RNNModel(torch.nn.Module):
         """Full fitting of the model"""
         y = self._adjust_type_dims_device(x=y, target_dim=2)
         X = self._adjust_type_dims_device(x=X, target_dim=3)
-
         for _ in tqdm(range(self.num_epochs)):
             self._train_epoch(X, y)
 
@@ -88,4 +87,4 @@ class RNNModel(torch.nn.Module):
         """Method outputs prediction of the network. Needed to comply with sklearn interface"""
         X = self._adjust_type_dims_device(x=X, target_dim=3)
 
-        return self.forward(token=X)
+        return self.forward(token=X).cpu().detach().numpy()

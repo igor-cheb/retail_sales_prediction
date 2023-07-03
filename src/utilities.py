@@ -98,6 +98,7 @@ def run_cv(df: pd.DataFrame,
     splitter by months
     """
     # TODO: Control for the percentage of new customers and shops in the test data not seen in training
+    # TODO: Consider adding validation dataset into data split and do early stopping
     
     all_months = np.array(sorted(df['date_block_num'].unique()))
     all_months = all_months[all_months >= max([max(SHIFTS), max(WINS)])]# leaving enough months for longest shift/window calculation
