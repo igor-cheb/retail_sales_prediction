@@ -116,7 +116,6 @@ def run_cv(df: pd.DataFrame,
                   y=train_df[cols_di['target']].values.ravel())
         y_true = test_df[cols_di['target']].values
         y_pred = model.predict(test_df[cols_di['feats']])
-        
         rmse = mean_squared_error(y_true=y_true, y_pred=y_pred)**(.5)
         nrmse = rmse / np.std(y_true) # (np.percentile(y_true, 75) - np.percentile(y_true, 25))
 

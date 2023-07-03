@@ -11,6 +11,7 @@ class FeatureGenerator():
     """Class to generate all features used for training or inference."""
 
     #TODO: consider adding difference between lags and/or rolls as features
+    #TODO: create independent feature names generators, so that feature names are accessible before features are created
     
     def __init__(self, verbose: bool=False, save_files: bool=True):
         self.save_files = save_files
