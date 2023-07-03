@@ -1,8 +1,9 @@
 import gc
+import os
 import pandas as pd
 
 from src.utilities import generate_backbone, balance_zero_target, construct_cols_min_max, \
-    reduce_df_memory, check_folder
+    reduce_df_memory, check_folder, create_merged_raw
 from src.settings import PROCESSED_PATH, RAW_PATH, SHIFTS, WINS, ROLL_FUNCS, \
     COLS_MIN_MAX, GROUP_COLS, ZERO_PERC, SHOPS_BATCH_SIZE, BATCH_FEATS_PATH
 
@@ -10,12 +11,15 @@ class FeatureGenerator():
     """Class to generate all features used for training or inference."""
 
     #TODO: consider adding difference between lags and/or rolls as features
+    #TODO: create independent feature names generators, so that feature names are accessible before features are created
     
     def __init__(self, verbose: bool=False, save_files: bool=True):
         self.save_files = save_files
         self.verbose = verbose
 
-        # reading file with raw data
+        # creating/reading file with raw data
+        if not os.path.exists(PROCESSED_PATH + 'merged_train_df.parquet'):
+            create_merged_raw()
         self.merged_df = pd.read_parquet(PROCESSED_PATH + 'merged_train_df.parquet')
         
         # creating lists of default columns
@@ -90,7 +94,7 @@ class FeatureGenerator():
                           balance_target_by_zero: bool=True) -> pd.DataFrame:
         """Calculating all features and merging them in one dataset"""
 
-        # generating base features outside batching to get all the gorupings correctly
+        # generating base features outside batching to get all the groupings correctly
         backbone = generate_backbone(cols_min_max=cols_min_max).merge(self.item_cat_map, how='left')
         feats_df = self._gen_base_features(backbone=backbone)
         feats_df = reduce_df_memory(feats_df)

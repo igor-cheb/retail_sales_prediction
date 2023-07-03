@@ -11,7 +11,8 @@ BATCH_FEATS_PATH = PROCESSED_PATH + 'feats_df_batches/'
 PREDS_PATH = 'data/predictions/'
 
 #length of windows and shifts
-SHIFTS = [1, 2, 3, 8, 12]
+# SHIFTS = [1, 2, 3, 8, 12]
+SHIFTS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 WINS = [2, 5, 12]
 
 #functions to be calculated as window aggregates
@@ -19,7 +20,7 @@ ROLL_FUNCS = ['sum', 'mean'] #, 'mean', 'std', 'min', 'max'
 
 # min and max for months and IDs of shops and items. Extracted from respective raw files
 COLS_MIN_MAX = {
-    'shop_id':        (20, 35), #(26, 28), (2, 59)
+    'shop_id':        (26, 28), #(26, 28), (2, 59) (20, 40),
     'item_id':        (0, 22169), #(30, 22167)
     'date_block_num': (0, 33)
 }
