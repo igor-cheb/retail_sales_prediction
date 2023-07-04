@@ -1,5 +1,7 @@
 # honest_home_task
-WORK IN PROGRESS WORK IN PROGRESS WORK IN PROGRESS </br>
+WORK IN PROGRESS WORK IN PROGRESS WORK IN PROGRESS  
+
+    
 Implementation of a take home task as part of Honest bank recruitment process
 
 Before running any notebook or flask app, please put the raw data into the `data/raw/` folder </br>
@@ -28,4 +30,5 @@ Project structure:
   - modelling: sandbox for modelling experiments
   - kaggle_submission: notebook to generate kaggle submissions
 
+    
 WORK IN PROGRESS WORK IN PROGRESS WORK IN PROGRESS
