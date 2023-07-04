@@ -1,14 +1,18 @@
 # honest_home_task
-WORK IN PROGRESS </br>
+WORK IN PROGRESS WORK IN PROGRESS WORK IN PROGRESS </br>
 Implementation of a take home task as part of Honest bank recruitment process
 
 Pipfile is provided to install all packages used.
 
-Before running any notebook, please put the raw data into the `data/raw/` folder </br>
+Before running any notebook or flask app, please put the raw data into the `data/raw/` folder </br>
+Raw data used is found here: https://www.kaggle.com/c/competitive-data-science-predict-future-sales/data
+
+To start the flask endpoint that serves the trained model: `python src/endpoint.py`
 
 Project structure:
 <ul>
 <li>data: raw and processed data used for training and inference</li>
+<li>models: models saved during experiments</li>
 <li>src: classes, settings and utilities used in modelling and data transformation</li>
 <li>notebooks:</li>
     <ul>
@@ -19,4 +23,4 @@ Project structure:
     </ul>
 </ul>
 
-WORK IN PROGRESS
+WORK IN PROGRESS WORK IN PROGRESS WORK IN PROGRESS

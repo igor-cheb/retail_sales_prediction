@@ -31,7 +31,7 @@ COLS_MIN_MAX = {
     'date_block_num': (0, 33)
 }
 
-# columns groups for calculation aggregate features
+# columns groups for calculation of aggregate features
 GROUP_COLS = {
     'shop':          ['shop_id', 'date_block_num'],
     'item':          ['item_id', 'date_block_num'],
@@ -43,5 +43,5 @@ GROUP_COLS = {
 # Ho much zero target to include in train data, as percent of non-zero target
 ZERO_PERC = .8
 
-# batch size for features processing
+# batch size for features processing, number of unique shop_id in 1 batch
 SHOPS_BATCH_SIZE = 8
