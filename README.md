@@ -9,8 +9,15 @@ Raw data could be found here: https://www.kaggle.com/c/competitive-data-science-
 
 To use the flask app:
 <ul>
-<li>Initiate the pipenv environment first: `pipenv shell`.</li>
-<li>Start the flask endpoint that serves the trained model: `python src/endpoint.py`</li>
+<li>Initiate the pipenv environment and install necessary packages: </li>
+"""
+pipenv shell
+pipenv install
+"""
+<li>Start the flask endpoint that serves the trained model: </li>
+"""
+python src/endpoint.py
+"""
 </ul>
 
 Project structure:
