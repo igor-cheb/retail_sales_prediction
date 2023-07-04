@@ -5,7 +5,7 @@ Implementation of a take home task as part of Honest bank recruitment process
 Pipfile is provided to install all packages used.
 
 Before running any notebook or flask app, please put the raw data into the `data/raw/` folder </br>
-Raw data used is found here: https://www.kaggle.com/c/competitive-data-science-predict-future-sales/data
+Raw data could be found here: https://www.kaggle.com/c/competitive-data-science-predict-future-sales/data
 
 To use the flask app:
 <ul>
