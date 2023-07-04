@@ -77,7 +77,9 @@ def create_merged_raw(raw_folder_path: str=RAW_PATH, merged_name: str='merged_tr
     sales_train = pd.read_csv(raw_folder_path + 'sales_train.csv')
     items = pd.read_csv(raw_folder_path + 'items.csv')[['item_id', 'item_category_id']]
     merged = sales_train.merge(items, how='left', on='item_id')
-    merged.to_parquet(PROCESSED_PATH + f'{merged_name}.parquet')
+    check_folder(PROCESSED_PATH)
+    save_path = PROCESSED_PATH + f'{merged_name}.parquet'
+    merged.to_parquet(save_path)
     
 def read_train() -> pd.DataFrame:
     """Function reads and concats batched processed datasets with features"""
