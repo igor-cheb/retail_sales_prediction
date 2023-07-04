@@ -144,7 +144,7 @@ class FeatureGenerator():
         out_df = pd.concat(all_out_dfs, ignore_index=True)
         return out_df 
 
-    def add_features_to_backbone(self,test_backbone: pd.DataFrame,
+    def add_features_to_backbone(self, test_backbone: pd.DataFrame,
                                  target_month: int) -> pd.DataFrame:
         """
         Function takes in test backbone, i.e. df of shops and items, 
