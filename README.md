@@ -16,7 +16,9 @@ To use the flask app:
 - Start the flask endpoint that serves the trained model:
 
       python src/endpoint.py
-
+  URL query example:
+  
+      http://localhost:8000/?shop_id=5&shop_id=1&shop_id=10&item_id=11&item_id=8&item_id=44
 Project structure:
 
 - data: raw and processed data used for training and inference
