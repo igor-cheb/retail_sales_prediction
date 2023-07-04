@@ -6,29 +6,26 @@ Before running any notebook or flask app, please put the raw data into the `data
 Raw data could be found here: https://www.kaggle.com/c/competitive-data-science-predict-future-sales/data
 
 To use the flask app:
-<ul>
-<li>Put raw data into the <code>data/raw/</code> folder </li>
-<li>Initiate the pipenv environment and install necessary packages: </li>
-<pre><code>pipenv shell
-pipenv install
-</code></pre>
-<li>Start the flask endpoint that serves the trained model: </li>
-<pre><code>python src/endpoint.py
-</code></pre>
-</ul>
+
+- Put raw data into the `data/raw/` folder
+- Initiate the pipenv environment and install necessary packages:
+
+      pipenv shell
+      pipenv install
+
+- Start the flask endpoint that serves the trained model:
+
+      python src/endpoint.py
 
 Project structure:
-<ul>
-<li>data: raw and processed data used for training and inference</li>
-<li>models: models saved during experiments</li>
-<li>src: classes, settings and utilities used in modelling and data transformation</li>
-<li>notebooks:</li>
-    <ul>
-    <li>EDA: short data exploration</li>
-    <li>ETL: sandbox notebook for development and testing of feature engineering and cross validation </li>
-    <li>modelling: sandbox for modelling experiments</li>
-    <li>kaggle_submission: notebook to generate kaggle submissions</li>
-    </ul>
-</ul>
+
+- data: raw and processed data used for training and inference
+- models: models saved during experiments
+- src: classes, settings and utilities used in modelling and data transformation
+- notebooks:
+  - EDA: short data exploration
+  - ETL: sandbox notebook for development and testing of feature engineering and cross validation
+  - modelling: sandbox for modelling experiments
+  - kaggle_submission: notebook to generate kaggle submissions
 
 WORK IN PROGRESS WORK IN PROGRESS WORK IN PROGRESS
