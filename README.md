@@ -1,8 +1,5 @@
 # honest_home_task
-WORK IN PROGRESS WORK IN PROGRESS WORK IN PROGRESS  
-
-
-  
+WORK IN PROGRESS WORK IN PROGRESS WORK IN PROGRESS <br><br><br>
 Implementation of a take home task as part of Honest bank recruitment process
 
 Before running any notebook or flask app, please put the raw data into the `data/raw/` folder </br>
@@ -30,6 +27,5 @@ Project structure:
   - ETL: sandbox notebook for development and testing of feature engineering and cross validation
   - modelling: sandbox for modelling experiments
   - kaggle_submission: notebook to generate kaggle submissions
-
-    
+<br><br><br>
 WORK IN PROGRESS WORK IN PROGRESS WORK IN PROGRESS
