@@ -7,7 +7,11 @@ Pipfile is provided to install all packages used.
 Before running any notebook or flask app, please put the raw data into the `data/raw/` folder </br>
 Raw data used is found here: https://www.kaggle.com/c/competitive-data-science-predict-future-sales/data
 
-To start the flask endpoint that serves the trained model: `python src/endpoint.py`
+To use the flask app:
+<ul>
+<li>Initiate the pipenv environment first: `pipenv shell`.</li>
+<li>Start the flask endpoint that serves the trained model: `python src/endpoint.py`</li>
+</ul>
 
 Project structure:
 <ul>
