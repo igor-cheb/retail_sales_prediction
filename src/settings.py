@@ -10,6 +10,12 @@ BATCH_FEATS_PATH = PROCESSED_PATH + 'feats_df_batches/'
 # saved predictions
 PREDS_PATH = 'data/predictions/'
 
+# saved models
+MODELS_PATH = 'models/'
+
+# path to the model tb used in the flask app
+APP_MODEL_PATH = MODELS_PATH + 'cat_1.cbm'
+
 #length of windows and shifts
 # SHIFTS = [1, 2, 3, 8, 12]
 SHIFTS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]

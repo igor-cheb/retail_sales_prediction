@@ -103,7 +103,8 @@ def run_cv(df: pd.DataFrame,
     all_months = np.array(sorted(df['date_block_num'].unique()))
     all_months = all_months[all_months >= max([max(SHIFTS), max(WINS)])]# leaving enough months for longest shift/window calculation
     cv_results = {'rmse':[], 'nrmse':[], 'train_months':[], 
-                  'test_months':[], 'train_data':[], 'test_data':[], 'pred':[]}
+                  'test_months':[], 'train_data':[], 'test_data':[], 
+                  'pred':[], 'models':[]}
     
     for i, (train_index, test_index) in enumerate(months_cv_split.split(all_months)):
         train_months = all_months[train_index]
@@ -132,6 +133,7 @@ def run_cv(df: pd.DataFrame,
         cv_results['train_data'].append(train_df)
         cv_results['test_data'].append(test_df)
         cv_results['pred'].append(y_pred)
+        cv_results['models'].append(model)
     if verbose in [1, 2]:
         print('\n' + '-'*30)
         print(f"RMSE mean: {np.mean(cv_results['rmse']):.2}")
