@@ -2,13 +2,12 @@
 WORK IN PROGRESS WORK IN PROGRESS WORK IN PROGRESS </br>
 Implementation of a take home task as part of Honest bank recruitment process
 
-Pipfile is provided to install all packages used.
-
 Before running any notebook or flask app, please put the raw data into the `data/raw/` folder </br>
 Raw data could be found here: https://www.kaggle.com/c/competitive-data-science-predict-future-sales/data
 
 To use the flask app:
 <ul>
+<li>Put raw data into the <code>data/raw/</code> folder </li>
 <li>Initiate the pipenv environment and install necessary packages: </li>
 <pre><code>pipenv shell
 pipenv install
