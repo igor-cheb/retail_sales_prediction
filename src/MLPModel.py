@@ -33,8 +33,8 @@ class MLPModel(torch.nn.Module):
                 batch_X = loc_X[ixs]
                 batch_y = loc_y[ixs]
                 pred = self.layers(batch_X)
-                loss = torch.nn.functional.l1_loss(input=pred.flatten(), 
-                                                   target=batch_y.flatten())
+                loss = torch.nn.functional.mse_loss(input=pred.flatten(), 
+                                                    target=batch_y.flatten())
                 self.optim.zero_grad()
                 loss.backward()
                 self.optim.step()
