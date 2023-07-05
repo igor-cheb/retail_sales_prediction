@@ -2,6 +2,7 @@ import torch
 
 class AutoEncoder (torch.nn.Module):
     def __init__(self, input_dim: int, latent_dim: int, num_epochs: int=100):
+        super().__init__()
         self.num_epochs = num_epochs
 
         self.encoder = torch.nn.Sequential(
@@ -35,6 +36,7 @@ class AutoEncoder (torch.nn.Module):
     def fit(self, X, y):
         for _ in range(self.num_epochs):
             pred = self.forward(X)
+            print(pred.shape)
             loss = torch.nn.functional.mse_loss(input=pred, target=y)
 
             self.optim.zero_grad()
