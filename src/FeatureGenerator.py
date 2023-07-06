@@ -130,7 +130,7 @@ class FeatureGenerator():
                                                 zero_perc=ZERO_PERC, 
                                                 target_col=self.target_col[0])
             else:
-                batch_df = loc_feats_df[out_cols]
+                batch_df = loc_feats_df[out_cols][loc_feats_df[out_cols][self.target_col[0]]>0]
             all_out_dfs.append(batch_df)
 
             # saving current batch
@@ -142,7 +142,7 @@ class FeatureGenerator():
         if self.verbose: print('concatenating')
         gc.collect()
         out_df = pd.concat(all_out_dfs, ignore_index=True)
-        return out_df 
+        return out_df[out_df[self.target_col[0]] >= 0]
 
     def add_features_to_backbone(self, test_backbone: pd.DataFrame,
                                  target_month: int) -> pd.DataFrame:

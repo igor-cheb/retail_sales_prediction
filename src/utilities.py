@@ -57,7 +57,7 @@ def balance_zero_target(df: pd.DataFrame,
                         zero_perc: float,  # between 0 an 1, what percent of zero target to output
                         target_col: str 
                         ) -> pd.DataFrame:
-    """Subsamples rows with zero target to prevent the model to overfitting to 0"""
+    """Subsamples rows with zero target to prevent the model from overfitting to 0"""
     local_df = df.copy()
     non_zero_df = local_df[local_df[target_col]!=0]
     zero_df = local_df[local_df[target_col]==0].sample(int(non_zero_df.shape[0] * zero_perc))
@@ -118,7 +118,7 @@ def run_cv(df: pd.DataFrame,
         model.fit(X=train_df[cols_to_fit], 
                   y=train_df[cols_di['target']].values.ravel())
         y_true = test_df[cols_di['target']].values
-        y_pred = model.predict(test_df[cols_di['feats']])
+        y_pred = model.predict(test_df[cols_di['feats']]).round()
         rmse = mean_squared_error(y_true=y_true, y_pred=y_pred)**(.5)
         nrmse = rmse / np.std(y_true) # (np.percentile(y_true, 75) - np.percentile(y_true, 25))
 
