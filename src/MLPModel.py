@@ -15,12 +15,13 @@ class MLPModel(torch.nn.Module):
             torch.nn.Linear(input_size, 64),
             torch.nn.LeakyReLU(),
             torch.nn.Linear(64, 1),
+            torch.nn.SiLU()
             )
         self.optim = torch.optim.Adam(self.parameters())
         
     def predict(self, X: np.ndarray):
         loc_X = torch.tensor(X, dtype=torch.float32) #
-        return self.layers(loc_X).detach().numpy()
+        return self.layers(loc_X).detach().numpy().round()
     
     def fit(self, X: pd.DataFrame, y: pd.Series):
         loc_X = torch.tensor(X, dtype=torch.float32)
@@ -32,9 +33,9 @@ class MLPModel(torch.nn.Module):
                 ixs = np.array(range(i, min([X.shape[0], i + self.batch_size])))
                 batch_X = loc_X[ixs]
                 batch_y = loc_y[ixs]
-                pred = self.layers(batch_X)
-                loss = torch.nn.functional.l1_loss(input=pred.flatten(), 
-                                                   target=batch_y.flatten())
+                pred = self.layers(batch_X).round()
+                loss = torch.nn.functional.mse_loss(input=pred.flatten(), 
+                                                    target=batch_y.flatten())
                 self.optim.zero_grad()
                 loss.backward()
                 self.optim.step()
