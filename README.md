@@ -1,6 +1,5 @@
-# honest_home_task
-WORK IN PROGRESS WORK IN PROGRESS WORK IN PROGRESS <br><br><br>
-Implementation of a take home task as part of Honest bank recruitment process
+# Banking startup home task
+Implementation of a take home task as part of recruitment process for a banking startup
 
 Before running any notebook or flask app, please put the raw data into the `data/raw/` folder </br>
 Raw data could be found here: https://www.kaggle.com/c/competitive-data-science-predict-future-sales/data
@@ -31,4 +30,3 @@ Project structure:
   - kaggle_submission: notebook to generate kaggle submissions
 <br><br><br>
   
-WORK IN PROGRESS WORK IN PROGRESS WORK IN PROGRESS
