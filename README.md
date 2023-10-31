@@ -1,4 +1,4 @@
-# Banking startup home task
+# Prediction of sales for a retail chain
 Implementation of a take home task as part of recruitment process for a banking startup
 
 Before running any notebook or flask app, please put the raw data into the `data/raw/` folder </br>
